@@ -1,16 +1,97 @@
 <template>
   <div id="app">
-    <div id="nav">
-      <router-link to="/">Home</router-link> |
-      <router-link to="/about">About</router-link>
-    </div>
+    <Header/>
+    <Modals/>
     <router-view/>
   </div>
 </template>
+<script>
+import Vue from "vue";
+import BootstrapVue from "bootstrap-vue";
+Vue.use(BootstrapVue);
+import "bootstrap/dist/css/bootstrap.css";
+import "bootstrap-vue/dist/bootstrap-vue.css";
+
+import Header from "./components/HeaderBlock/Main";
+import Modals from "./components/Modals/Main";
+export default {
+  components: {
+    Header,
+    Modals
+  }
+};
+</script>
 
 <style>
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  margin: 1.5rem 0;
+  font-weight: 300;
+}
+body {
+  background: #fafafa;
+}
+a {
+  font-weight: 600;
+}
+.btn-primary {
+  color: #ffffff;
+  background-color: #4b41ab;
+  border-color: #4b41ab;
+}
+.btn-primary:hover {
+  background-color: #3d2798;
+  border-color: #3d2798;
+}
+.btn-primary:not(:disabled):not(.disabled):active:focus {
+  box-shadow: 0 0 0 0.2rem rgba(104, 93, 199, 0.27);
+}
+.btn-primary:not(:disabled):not(.disabled):focus {
+  box-shadow: 0 0 0 0.2rem rgba(104, 93, 199, 0.27);
+}
+.btn-primary:not(:disabled):not(.disabled):active {
+  background-color: #7369c8;
+  border-color: #7369c8;
+}
+.form-control:focus {
+  border-color: #08023e;
+  box-shadow: none;
+}
+.form-control::placeholder {
+  font-weight: 300;
+  color: #ddd;
+}
+.input-lg {
+  height: 48px;
+  padding: 10px 15px;
+  font-size: 18px;
+}
+.left {
+  text-align: left;
+}
+.right {
+  text-align: right;
+}
+.col-sm-2,
+.col-sm-3,
+.col-sm-4,
+.col-sm-5,
+.col-sm-6,
+.col-sm-7,
+.col-sm-8,
+.col-sm-10 {
+  float: left;
+}
+.centered {
+  text-align: center;
+}
+@import url("https://fonts.googleapis.com/css?family=Poppins:300,400,600");
 #app {
-  font-family: "Avenir", Helvetica, Arial, sans-serif;
+  font-family: "Poppins", Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
@@ -19,7 +100,6 @@
 #nav {
   padding: 30px;
 }
-
 #nav a {
   font-weight: bold;
   color: #2c3e50;
