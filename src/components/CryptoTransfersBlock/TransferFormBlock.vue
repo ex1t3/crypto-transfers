@@ -129,7 +129,6 @@
 }
 .coin-type-label {
   text-align: right;
-  margin-top: 15px;
 }
 .coin-type-block {
   display: flex;
