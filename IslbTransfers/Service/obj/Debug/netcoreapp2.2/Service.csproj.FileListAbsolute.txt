@@ -1,0 +1,14 @@
+E:\wamp64\www\islb-transfers\ISLBTransfers\Service\bin\Debug\netcoreapp2.2\Service.deps.json
+E:\wamp64\www\islb-transfers\ISLBTransfers\Service\bin\Debug\netcoreapp2.2\Service.dll
+E:\wamp64\www\islb-transfers\ISLBTransfers\Service\bin\Debug\netcoreapp2.2\Service.pdb
+E:\wamp64\www\islb-transfers\ISLBTransfers\Service\bin\Debug\netcoreapp2.2\DAL.dll
+E:\wamp64\www\islb-transfers\ISLBTransfers\Service\bin\Debug\netcoreapp2.2\Model.dll
+E:\wamp64\www\islb-transfers\ISLBTransfers\Service\bin\Debug\netcoreapp2.2\DAL.pdb
+E:\wamp64\www\islb-transfers\ISLBTransfers\Service\bin\Debug\netcoreapp2.2\Model.pdb
+E:\wamp64\www\islb-transfers\ISLBTransfers\Service\obj\Debug\netcoreapp2.2\Service.csprojAssemblyReference.cache
+E:\wamp64\www\islb-transfers\ISLBTransfers\Service\obj\Debug\netcoreapp2.2\Service.csproj.CoreCompileInputs.cache
+E:\wamp64\www\islb-transfers\ISLBTransfers\Service\obj\Debug\netcoreapp2.2\Service.AssemblyInfoInputs.cache
+E:\wamp64\www\islb-transfers\ISLBTransfers\Service\obj\Debug\netcoreapp2.2\Service.AssemblyInfo.cs
+E:\wamp64\www\islb-transfers\ISLBTransfers\Service\obj\Debug\netcoreapp2.2\Service.csproj.CopyComplete
+E:\wamp64\www\islb-transfers\ISLBTransfers\Service\obj\Debug\netcoreapp2.2\Service.dll
+E:\wamp64\www\islb-transfers\ISLBTransfers\Service\obj\Debug\netcoreapp2.2\Service.pdb

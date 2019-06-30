@@ -28,7 +28,7 @@
   </b-container>
 </template>
 <script>
-import Main from "@/components/CryptoTransfersBlock/Main";
+import Main from "@/components/CryptoTransfersBlock/MainCryptoTransfersBlock";
 export default {
   extends: Main,
   data() {

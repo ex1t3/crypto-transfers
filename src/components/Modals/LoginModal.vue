@@ -14,24 +14,58 @@
     </div>
     <small>OR</small>
     <div class="auth-form-block">
-      <b-form class="from-horizontal">
+      <b-form v-on:submit="logIn($event)" class="from-horizontal">
         <div class="form-group left">
           <label for="Email">Email</label>
-          <input class="form-control" type="email" name="Email" id="Email">
+          <input v-model="login.Email" required class="form-control" type="email">
         </div>
         <div class="form-group left">
           <label for="Password">Password</label>
-          <input class="form-control" type="password" name="Password" id="Password">
+          <input v-model="login.Password" required class="form-control" type="password">
         </div>
         <p><small><a @click="$root.$emit('bv::show::modal', 'remindPassword')" href="#">I don't remember my password</a></small></p>
         <div class="form-group centered">
-            <b-btn type="submit" class="btn-primary">LOG IN</b-btn>
+            <b-btn :disabled="login.Email === '' || login.Password === ''" type="submit" class="btn-primary">LOG IN</b-btn>
         </div>       
         <p><small><a @click="$root.$emit('bv::show::modal', 'signUpModal')" href="#">I don't have an account</a></small></p>
       </b-form>
     </div>
   </b-modal>
 </template>
+<script>
+import { mapGetters } from 'vuex'
+import store from '../../store'
+import axios from 'axios'
+
+export default {
+  store,
+  data() {
+    return {
+      login: {Email: '', Password: ''}
+    }
+  },
+  computed: mapGetters({
+    user: 'getUser'
+  }),
+  methods: {
+    logIn (e) {
+      e.preventDefault()
+      axios({
+        method: 'POST',
+        url: 'https://localhost:44357/api/account/login',
+        data: this.login,
+        header: {
+          'Content-Type': 'application/json'
+        }
+      }).then(function (params) {
+        this.$store.commit('setUser', params.data)
+      }).catch(function (params) {
+        console.log(params)
+      });
+    }
+  }
+}
+</script>
 
 <style scoped>
 .social-auth-links {

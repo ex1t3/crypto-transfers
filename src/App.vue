@@ -12,8 +12,8 @@ Vue.use(BootstrapVue);
 import "bootstrap/dist/css/bootstrap.css";
 import "bootstrap-vue/dist/bootstrap-vue.css";
 
-import Header from "./components/HeaderBlock/Main";
-import Modals from "./components/Modals/Main";
+import Header from "./components/FooterHeaderBlock/HeaderBlock";
+import Modals from "./components/Modals/MainModals";
 export default {
   components: {
     Header,
@@ -107,5 +107,24 @@ a {
 
 #nav a.router-link-exact-active {
   color: #42b983;
+}
+@media (max-width: 700px){
+  h2 {
+    font-size: 1.25rem;
+    margin: 1rem;
+  }
+  h3 {
+    font-size: 1.1rem;
+    margin: 0.5rem;
+  }
+  h4 {
+    font-size: 1rem;
+    margin: 0.5rem;
+
+  }
+  h5 {
+    font-size: 0.9rem;
+    margin: 0.3rem;
+  }
 }
 </style>

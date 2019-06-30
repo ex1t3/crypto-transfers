@@ -14,23 +14,23 @@
     </div>
     <small>OR</small>
     <div class="auth-form-block">
-      <b-form class="from-horizontal">
+      <b-form v-on:submit="logIn($event)" class="from-horizontal">
         <div class="form-group left">
           <label for="SignUp_Email">Email</label>
-          <input class="form-control" type="email" name="Email" id="SignUp_Email">
+          <input required v-model="login.Email" class="form-control" type="email">
         </div>
         <div class="form-group left">
           <label for="SignUp_Password">Password</label>
-          <input class="form-control" type="password" name="Password" id="SignUp_Password">
+          <input required v-model="login.Password" class="form-control" type="password">
         </div>
         <p>
-          <input id="accept_terms" required type="checkbox">
+          <input v-model="login.Agreement" id="accept_terms" required type="checkbox">
           <label for="accept_terms">I accept
             <a href="#">Terms of Use</a>
           </label>
         </p>
         <div class="form-group centered">
-          <b-btn type="submit" class="btn-primary">SIGN UP</b-btn>
+          <b-btn :dsabled="login.Email === '' || login.Password === '' || !login.Agreement" type="submit" class="btn-primary">SIGN UP</b-btn>
         </div>
         <p>
           <small>
@@ -41,7 +41,40 @@
     </div>
   </b-modal>
 </template>
+<script>
+import { mapGetters } from 'vuex'
+import store from '../../store'
+import axios from 'axios'
 
+export default {
+  store,
+  data() {
+    return {
+      login: {Email: '', Password: '', Aggreement: false}
+    }
+  },
+  computed: mapGetters({
+    user: 'getUser'
+  }),
+  methods: {
+    logIn (e) {
+      e.preventDefault()
+      axios({
+        method: 'POST',
+        url: 'https://localhost:44357/api/account/register',
+        data: this.login,
+        header: {
+          'Content-Type': 'application/json'
+        }
+      }).then(function (params) {
+        console.log(params);
+      }).catch(function (params) {
+        console.log(params)
+      });
+    }
+  }
+}
+</script>
 <style scoped>
 .social-auth-links {
   display: flex;

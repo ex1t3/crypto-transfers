@@ -1,0 +1,13 @@
+E:\wamp64\www\islb-transfers\IslbTransfers\IslbTransfers\bin\Debug\netcoreapp2.1\IslbTransfers.deps.json
+E:\wamp64\www\islb-transfers\IslbTransfers\IslbTransfers\bin\Debug\netcoreapp2.1\IslbTransfers.runtimeconfig.json
+E:\wamp64\www\islb-transfers\IslbTransfers\IslbTransfers\bin\Debug\netcoreapp2.1\IslbTransfers.runtimeconfig.dev.json
+E:\wamp64\www\islb-transfers\IslbTransfers\IslbTransfers\bin\Debug\netcoreapp2.1\IslbTransfers.dll
+E:\wamp64\www\islb-transfers\IslbTransfers\IslbTransfers\bin\Debug\netcoreapp2.1\IslbTransfers.pdb
+E:\wamp64\www\islb-transfers\IslbTransfers\IslbTransfers\obj\Debug\netcoreapp2.1\IslbTransfers.csproj.CoreCompileInputs.cache
+E:\wamp64\www\islb-transfers\IslbTransfers\IslbTransfers\obj\Debug\netcoreapp2.1\IslbTransfers.RazorAssemblyInfo.cache
+E:\wamp64\www\islb-transfers\IslbTransfers\IslbTransfers\obj\Debug\netcoreapp2.1\IslbTransfers.RazorAssemblyInfo.cs
+E:\wamp64\www\islb-transfers\IslbTransfers\IslbTransfers\obj\Debug\netcoreapp2.1\IslbTransfers.AssemblyInfoInputs.cache
+E:\wamp64\www\islb-transfers\IslbTransfers\IslbTransfers\obj\Debug\netcoreapp2.1\IslbTransfers.AssemblyInfo.cs
+E:\wamp64\www\islb-transfers\IslbTransfers\IslbTransfers\obj\Debug\netcoreapp2.1\IslbTransfers.RazorTargetAssemblyInfo.cache
+E:\wamp64\www\islb-transfers\IslbTransfers\IslbTransfers\obj\Debug\netcoreapp2.1\IslbTransfers.dll
+E:\wamp64\www\islb-transfers\IslbTransfers\IslbTransfers\obj\Debug\netcoreapp2.1\IslbTransfers.pdb
