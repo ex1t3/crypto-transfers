@@ -1,37 +1,47 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
+using System.Net;
+using System.Net.Http;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
+using System.Threading.Tasks;
 using DAL.DbRepository;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Model.Models;
+using Newtonsoft.Json;
 
 namespace Service.Services
 {
     public interface IUserService
     {
         UserClientData Authenticate(User user);
-        UserClientData Register(UserLoginViewModel user);
+        UserClientData Register(User user);
         User CheckForUserIdentity(string email, string password);
+        User GetByEmail(string email);
+        Task<FacebookCredentials> GetUserDataViaFacebook(string token);
         string HashPassword(string password);
         bool CheckHash(string typedPassword, string storedPassword);
         void Add(User user);
         void AddSession(int userId, string token);
         void Update(User user);
+        void AddExternalLogin(UserExternalLogin login);
+        UserExternalLogin GetExternalLogin(long id);
     }
     public class UserService : IUserService
     {
         private readonly IDbRepository<User> _userRepository;
         private readonly IDbRepository<UserSession> _sessionRepository;
+        private readonly IDbRepository<UserExternalLogin> _externalLoginRepository;
         private readonly OAuthSettings _oauthOptions;
 
-        public UserService(IDbRepository<User> userRepository, IOptions<OAuthSettings> oauthOptions, IDbRepository<UserSession> sessionRepository)
+        public UserService(IDbRepository<User> userRepository, IOptions<OAuthSettings> oauthOptions, IDbRepository<UserSession> sessionRepository, IDbRepository<UserExternalLogin> externalLoginRepository)
         {
             this._userRepository = userRepository;
             _sessionRepository = sessionRepository;
+            _externalLoginRepository = externalLoginRepository;
             _oauthOptions = oauthOptions.Value;
         }
 
@@ -58,23 +68,22 @@ namespace Service.Services
         // Check if user data is correct
         public User CheckForUserIdentity(string email, string password)
         {
-            var user = _userRepository.Get(x => x.Email == email); // check if user exists
+            var user = GetByEmail(email); // check if user exists
             if (user == null) return null;
             return CheckHash(password, user.Password) ? user : null;
         }
 
         // Register user in DB
-        public UserClientData Register(UserLoginViewModel user)
+        public UserClientData Register(User registeredUser)
         {
-            if (_userRepository.Get(x => x.Email == user.Email) != null) return null;
-            var registeredUser = new User()
-            {
-                Email = user.Email,
-                Password = user.Password
-            };
             Add(registeredUser);
             var userClientData = Authenticate(registeredUser);
             return userClientData;
+        }
+
+        public User GetByEmail(string email)
+        {
+            return _userRepository.Get(x => x.Email == email);
         }
 
         // Generate JWT token for authorization
@@ -82,16 +91,17 @@ namespace Service.Services
         {
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes(_oauthOptions.Secret);
+            var credentials = new SigningCredentials(new SymmetricSecurityKey(key),
+                SecurityAlgorithms.HmacSha256Signature);
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(new Claim[]
                 {
+                    new Claim(ClaimTypes.Name, user.Email),
                     new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-                    new Claim(ClaimTypes.Name, user.Email), 
                 }),
                 Expires = DateTime.UtcNow.AddDays(7),
-                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key),
-                    SecurityAlgorithms.HmacSha256Signature)
+                SigningCredentials = credentials
             };
             return tokenHandler.WriteToken(tokenHandler.CreateToken(tokenDescriptor));
         }
@@ -130,10 +140,10 @@ namespace Service.Services
         // Add new user to DB
         public void Add(User user)
         {
-            user.Password = HashPassword(user.Password);
             _userRepository.Add(user);
         }
 
+        // Register in DB new user's session
         public void AddSession(int userId, string token)
         {
             var session = new UserSession()
@@ -150,6 +160,35 @@ namespace Service.Services
         public void Update(User user)
         {
             _userRepository.Update(user);
+        }
+
+        public void AddExternalLogin(UserExternalLogin login)
+        {
+            _externalLoginRepository.Add(login);
+        }
+
+        public UserExternalLogin GetExternalLogin(long id)
+        {
+            return _externalLoginRepository.GetById(id);
+        }
+
+        // Pull user login data via Facebook API
+        public async Task<FacebookCredentials> GetUserDataViaFacebook(string token)
+        {
+            using (var http = new HttpClient())
+            {
+                var postData = new Dictionary<string, string>()
+                {
+                    {"access_token",token}
+                };
+                var httpResponse = await http.PostAsync(
+                    $"https://graph.facebook.com/v2.8/me?fields=id,email,first_name,last_name,name,gender,locale,birthday,picture",
+                    new FormUrlEncodedContent(postData));
+                if (httpResponse.StatusCode != HttpStatusCode.OK) return null;
+                var resultsData = httpResponse.Content.ReadAsStringAsync().Result;
+                var fbCredentials = JsonConvert.DeserializeObject<FacebookCredentials>(resultsData);
+                return fbCredentials;
+            }
         }
     }
 }

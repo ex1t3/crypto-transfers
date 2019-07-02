@@ -13,8 +13,10 @@ namespace Model.Models
         public string FullName { get; set; }
         public string Password { get; set; }
         public string Email { get; set; }
+        public bool IsExtraLogged { get; set; }
 
         public ICollection<UserSession> UserSessions { get; set; }
+        public ICollection<UserExternalLogin> UserExternalLogins { get; set; }
     }
 
     public class UserClientData
@@ -22,6 +24,17 @@ namespace Model.Models
         public string FullName { get; set; }
         public string Token { get; set; }
         public string Email { get; set; }
+        public bool IsExtraLogged { get; set; }
+    }
+
+    public class UserExternalLogin
+    {
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.None)]
+        public long ProviderId { get; set; }
+        public string ProviderName { get; set; }
+        [ForeignKey("UserId")]
+        public int UserId { get; set; }
     }
 
     public class UserLoginViewModel
@@ -29,9 +42,12 @@ namespace Model.Models
         [Required]
         [MinLength(4, ErrorMessage = "Password should contain at least 4 symbols")]
         public string Password { get; set; }
+
         [Required(ErrorMessage = "The Email address is required")]
         [EmailAddress(ErrorMessage = "Invalid Email address")]
         public string Email { get; set; }
+
+        public string Fullname { get; set; }
     }
 
     public class UserSession
@@ -42,5 +58,13 @@ namespace Model.Models
         public int UserId { get; set; }
         public string Token { get; set; }
         public DateTime ExpiryDateTime { get; set; }
+    }
+
+    public class FacebookCredentials
+    { 
+        public string email { get; set; }
+        public string name { get; set; }
+        // Provider ID
+        public long id { get; set; }
     }
 }

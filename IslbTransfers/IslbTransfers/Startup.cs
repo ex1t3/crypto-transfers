@@ -34,13 +34,6 @@ namespace IslbTransfers
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.Configure<CookiePolicyOptions>(options =>
-            {
-                // This lambda determines whether user consent for non-essential cookies 
-                // is needed for a given request.
-                options.CheckConsentNeeded = context => true;
-                options.MinimumSameSitePolicy = SameSiteMode.None;
-            });
 
             services.AddCors();
 
@@ -65,13 +58,14 @@ namespace IslbTransfers
                         ValidateIssuerSigningKey = true,
                         IssuerSigningKey = new SymmetricSecurityKey(key),
                         ValidateIssuer = false,
-                        ValidateAudience = false
+                        ValidateAudience = false,
                     };
                 });
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IDbRepository<User>, DbRepository<User>>();
             services.AddScoped<IDbRepository<UserSession>, DbRepository<UserSession>>();
+            services.AddScoped<IDbRepository<UserExternalLogin>, DbRepository<UserExternalLogin>>();
             services.AddScoped<IDbFactory, DbFactory>();
         }
 
@@ -84,6 +78,7 @@ namespace IslbTransfers
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -91,19 +86,20 @@ namespace IslbTransfers
             else
             {
                 app.UseHsts();
+                app.UseExceptionHandler("/#/error");
             }
 
+            app.UseAuthentication();
             // global cors policy
             app.UseCors(x => x
                 .AllowAnyOrigin()
                 .AllowAnyMethod()
                 .AllowAnyHeader());
 
-            app.UseAuthentication();
             app.UseStaticFiles();
-            app.UseMvcWithDefaultRoute();
-            app.UseHttpsRedirection();
             app.UseMvc();
+            app.UseHttpsRedirection();
+            app.UseMvcWithDefaultRoute();
         }
     }
 }

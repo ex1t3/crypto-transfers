@@ -51,7 +51,7 @@
                 </div>
               </div>
               <div class="form-group">
-                <div class="col-sm-6 coin-type-label">Coin type</div>
+                <label class="col-sm-6 coin-type-label">Coin type</label>
                 <div class="col-sm-6 coin-type-block">
                   <div class="coin-type">
                     <div class="coin-icon">
@@ -98,23 +98,6 @@
   </div>
 </template>
 <style scoped>
-.btn-primary {
-  background-color: #8f88ce;
-  color: #fff;
-  border: none;
-  box-shadow: 0 0 20px #f3f3f321;
-}
-.btn-primary:hover {
-  background-color: #7369c8;
-  border-color: #7369c8;
-}
-.btn-primary:not(:disabled):not(.disabled):active:focus {
-  box-shadow: 0 0 0 0.2rem rgba(104, 93, 199, 0.27);
-}
-.btn-primary:not(:disabled):not(.disabled):active {
-  background-color: #7369c8;
-  border-color: #7369c8;
-}
 .transfer-form-block .form-control:focus {
   box-shadow: 0 0 0 0rem rgba(143, 136, 206, 0.17);
   border: transparent;

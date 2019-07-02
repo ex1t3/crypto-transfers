@@ -18,5 +18,6 @@ namespace DAL
         }
         public DbSet<User> Users { get; set; }
         public DbSet<UserSession> UserSessions { get; set; }
+        public DbSet<UserExternalLogin> UserExternalLogins { get; set; }
     }
 }

@@ -30,7 +30,7 @@
           </label>
         </p>
         <div class="form-group centered">
-          <b-btn :dsabled="login.Email === '' || login.Password === '' || !login.Agreement" type="submit" class="btn-primary">SIGN UP</b-btn>
+          <b-btn :disabled="login.Email === '' || login.Password === '' || !login.Agreement" type="submit" class="btn-primary">SIGN UP</b-btn>
         </div>
         <p>
           <small>
@@ -50,7 +50,7 @@ export default {
   store,
   data() {
     return {
-      login: {Email: '', Password: '', Aggreement: false}
+      login: {Email: '', Password: '', Agreement: false}
     }
   },
   computed: mapGetters({
@@ -67,7 +67,8 @@ export default {
           'Content-Type': 'application/json'
         }
       }).then(function (params) {
-        console.log(params);
+        this.$store.commit('setUser', params.data)
+        sessionStorage.setItem('access_token', params.data.token)
       }).catch(function (params) {
         console.log(params)
       });

@@ -29,11 +29,30 @@ namespace DAL.Migrations
 
                     b.Property<string>("FullName");
 
+                    b.Property<bool>("IsExtraLogged");
+
                     b.Property<string>("Password");
 
                     b.HasKey("Id");
 
                     b.ToTable("Users");
+                });
+
+            modelBuilder.Entity("Model.Models.UserExternalLogin", b =>
+                {
+                    b.Property<long>("ProviderId")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("ProviderName");
+
+                    b.Property<int>("UserId");
+
+                    b.HasKey("ProviderId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("UserExternalLogins");
                 });
 
             modelBuilder.Entity("Model.Models.UserSession", b =>
@@ -53,6 +72,14 @@ namespace DAL.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("UserSessions");
+                });
+
+            modelBuilder.Entity("Model.Models.UserExternalLogin", b =>
+                {
+                    b.HasOne("Model.Models.User")
+                        .WithMany("UserExternalLogins")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("Model.Models.UserSession", b =>

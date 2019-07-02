@@ -2,13 +2,13 @@
   <b-modal size="sm" :hide-footer="true" id="loginModal" title="Log In">
     <h6>Log In using:</h6>
     <div class="social-auth-links">
-      <a href="#" class="social-auth-link">
+      <a @click="externalLogin(0)" href="#" class="social-auth-link">
         <img src="../img/facebook.svg">
       </a>
-      <a href="#" class="social-auth-link">
+      <a @click="externalLogin(2)" href="#" class="social-auth-link">
         <img src="../img/twitter.svg">
       </a>
-      <a href="#" class="social-auth-link">
+      <a @click="externalLogin(1)" href="#" class="social-auth-link">
         <img src="../img/google-plus.svg">
       </a>
     </div>
@@ -33,34 +33,110 @@
   </b-modal>
 </template>
 <script>
+import Vue from 'vue'
 import { mapGetters } from 'vuex'
 import store from '../../store'
 import axios from 'axios'
+require('../../oauth/facebook/fb_sdk')
+require('../../oauth/google/google_sdk')
 
 export default {
   store,
   data() {
     return {
-      login: {Email: '', Password: ''}
+      login: {Email: '', Password: ''},
+      isFbReady: false,
+      isGoogReady: false,
     }
   },
   computed: mapGetters({
     user: 'getUser'
   }),
+  mounted () {
+    this.isFbReady = Vue.FB != undefined;
+    window.addEventListener('FB_SDK_READY', this.onFbReady);
+    window.addEventListener('GOOG_SDK_READY', this.onGoogReady);
+  },
+  beforeDestroy () {
+    window.removeEventListener('FB_SDK_READY');
+    window.removeEventListener('GOOG_SDK_READY');
+  },
   methods: {
+    onFbReady () {
+      this.isFbReady = true;
+    },
+    onGoogReady () {
+      this.isGoogReady = true;
+    },
+    externalLogin(provider) {
+      switch (provider) {
+
+        // FACEBOOK
+        case 0:
+          Vue.FB.login((response) => {
+            if (response.status == 'connected') {
+              this.logInFB(response.authResponse.accessToken);
+            }
+          });
+          break;
+
+        // GOOGLE
+        case 1:
+          console.log(Vue.gapi);
+          Vue.gapi.signIn().then((response) => {
+            console.log(response.Zi.id_token);
+          });
+          break;
+
+        default:
+          break;
+      }
+    },
+    logInFB (token) {
+      let that = this;
+      axios({
+        method: 'POST',
+        url: 'https://localhost:44357/api/account/facebook',
+        data: JSON.stringify(token),
+        headers: {
+          'Content-Type': 'application/json charset=UTF-8',
+        }
+      }).then(function (params) {
+        that.$store.commit('setUser', params.data);
+        sessionStorage.setItem('access_token', params.data.token);
+      }).catch(function (params) {
+        console.log(params);
+      });
+    },
     logIn (e) {
       e.preventDefault()
+      let that = this;
       axios({
         method: 'POST',
         url: 'https://localhost:44357/api/account/login',
         data: this.login,
-        header: {
+        headers: {
           'Content-Type': 'application/json'
         }
       }).then(function (params) {
-        this.$store.commit('setUser', params.data)
+        that.$store.commit('setUser', params.data);
+        sessionStorage.setItem('access_token', params.data.token);
+        that.check()
       }).catch(function (params) {
-        console.log(params)
+        console.log(params);
+      });
+    },
+    check () {
+      axios({
+        method: 'GET',
+        url: 'https://localhost:44357/api/values',
+        headers: {
+           Authorization: 'Bearer ' + sessionStorage.getItem('access_token')
+        }
+      }).then(function (params) {
+        
+      }).catch(function (params) {
+        console.log(params);
       });
     }
   }
