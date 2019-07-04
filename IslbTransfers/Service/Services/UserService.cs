@@ -21,14 +21,15 @@ namespace Service.Services
         UserClientData Register(User user);
         User CheckForUserIdentity(string email, string password);
         User GetByEmail(string email);
-        Task<FacebookCredentials> GetUserDataViaFacebook(string token);
+        Task<UserFacebookCredentials> GetUserDataViaFacebook(string token);
+        Task<UserGoogleCredentials> GetUserDataViaGoogle(string token);
         string HashPassword(string password);
         bool CheckHash(string typedPassword, string storedPassword);
         void Add(User user);
         void AddSession(int userId, string token);
         void Update(User user);
         void AddExternalLogin(UserExternalLogin login);
-        UserExternalLogin GetExternalLogin(long id);
+        UserExternalLogin GetExternalLogin(string id);
     }
     public class UserService : IUserService
     {
@@ -76,6 +77,7 @@ namespace Service.Services
         // Register user in DB
         public UserClientData Register(User registeredUser)
         {
+            registeredUser.CreatedDateTime = DateTime.Now;
             Add(registeredUser);
             var userClientData = Authenticate(registeredUser);
             return userClientData;
@@ -167,13 +169,13 @@ namespace Service.Services
             _externalLoginRepository.Add(login);
         }
 
-        public UserExternalLogin GetExternalLogin(long id)
+        public UserExternalLogin GetExternalLogin(string id)
         {
-            return _externalLoginRepository.GetById(id);
+            return _externalLoginRepository.Get(x=>x.ProviderId == id);
         }
 
         // Pull user login data via Facebook API
-        public async Task<FacebookCredentials> GetUserDataViaFacebook(string token)
+        public async Task<UserFacebookCredentials> GetUserDataViaFacebook(string token)
         {
             using (var http = new HttpClient())
             {
@@ -182,13 +184,38 @@ namespace Service.Services
                     {"access_token",token}
                 };
                 var httpResponse = await http.PostAsync(
-                    $"https://graph.facebook.com/v2.8/me?fields=id,email,first_name,last_name,name,gender,locale,birthday,picture",
+                    "https://graph.facebook.com/v2.8/me?fields=id,email,first_name,last_name,name,gender,locale,birthday,picture",
                     new FormUrlEncodedContent(postData));
                 if (httpResponse.StatusCode != HttpStatusCode.OK) return null;
                 var resultsData = httpResponse.Content.ReadAsStringAsync().Result;
-                var fbCredentials = JsonConvert.DeserializeObject<FacebookCredentials>(resultsData);
-                return fbCredentials;
+                var fbCredentials = JsonConvert.DeserializeObject<UserFacebookCredentials>(resultsData);
+                return CheckCredentialsForValidity(fbCredentials.email, fbCredentials.id) ? fbCredentials : null;
             }
+        }
+
+        // Pull user login data via Facebook API
+        public async Task<UserGoogleCredentials> GetUserDataViaGoogle(string token)
+        {
+            using (var http = new HttpClient())
+            {
+                var postData = new Dictionary<string, string>()
+                {
+                    {"id_token",token}
+                };
+                var httpResponse = await http.PostAsync(
+                    "https://www.googleapis.com/oauth2/v3/tokeninfo",
+                    new FormUrlEncodedContent(postData));
+                if (httpResponse.StatusCode != HttpStatusCode.OK) return null;
+                var resultsData = httpResponse.Content.ReadAsStringAsync().Result;
+                var googleCredentials = JsonConvert.DeserializeObject<UserGoogleCredentials>(resultsData);
+                return CheckCredentialsForValidity(googleCredentials.email, googleCredentials.id) ? googleCredentials : null;
+            }
+        }
+
+        // CHECK IF RECEIVED CREDENTIALS ARE VALID
+        public bool CheckCredentialsForValidity(string email, string id)
+        {
+            return email != null && id != null;
         }
     }
 }

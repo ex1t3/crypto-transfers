@@ -24,14 +24,20 @@
             <b-dropdown-item href="#">RU</b-dropdown-item>
             <b-dropdown-item href="#">FA</b-dropdown-item>
           </b-nav-item-dropdown>
-          <b-nav-item @click="$root.$emit('bv::show::modal', 'loginModal')" href="#">Log In</b-nav-item>
+          <b-nav-item v-if="!isLoggedIn" @click="$root.$emit('bv::show::modal', 'loginModal')" href="#">Log In</b-nav-item>
+          <b-nav-item v-if="isLoggedIn" href="#">Profile</b-nav-item>
         </b-navbar-nav>
       </b-collapse>
     </b-container>
   </b-navbar>
 </template>
 <script>
-export default {};
+import { mapGetters } from "vuex";
+export default {
+  computed: mapGetters({
+    isLoggedIn: 'getLoginState'
+  })
+};
 </script>
 <style>
 .nav-item {

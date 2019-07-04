@@ -27,6 +27,9 @@ namespace IslbTransfers.Controllers
         {
             var checkedUser = _userService.CheckForUserIdentity(loginUser.Email, loginUser.Password);
             if (checkedUser == null) return BadRequest("Incorrect User Data");
+            if (checkedUser.IsExtraLogged)
+                return BadRequest(
+                    "Seems this user was registered via social media and can't be logged in. Use social buttons instead.");
             var userClientData = _userService.Authenticate(checkedUser);
             return Ok(userClientData);
         }
@@ -55,7 +58,7 @@ namespace IslbTransfers.Controllers
             return BadRequest(errors);
         }
 
-        // LOGIN METHOD
+        // LOGIN METHOD VIA FACEBOOK
         [Route("facebook")]
         [HttpPost]
         public async Task<ActionResult<UserClientData>> FacebookOAuth([FromBody]string token)
@@ -85,6 +88,50 @@ namespace IslbTransfers.Controllers
                     UserId = loggedUser.Id,
                     ProviderId = userFbCredentials.id,
                     ProviderName = "Facebook"
+                });
+                return Ok(userClientData);
+            }
+
+            // User is already registered with facebook, so just authenticate him
+            else
+            {
+                loggedUser.Id = userExternalLogin.UserId;
+                userClientData.Token = _userService.Authenticate(loggedUser).Token;
+                userClientData.IsExtraLogged = true;
+                return Ok(userClientData);
+            }
+        }
+
+        // LOGIN METHOD VIA GOOGLE
+        [Route("google")]
+        [HttpPost]
+        public async Task<ActionResult<UserClientData>> GoogleOAuth([FromBody]string token)
+        {
+            var userGoogleCredentials = await _userService.GetUserDataViaGoogle(token);
+            if (userGoogleCredentials == null) return BadRequest("Something went wrong with your Google authentication...");
+            var loggedUser = new User()
+            {
+                Email = userGoogleCredentials.email,
+                FullName = userGoogleCredentials.name,
+                Password = null,
+                IsExtraLogged = true
+            };
+            var userClientData = new UserClientData()
+            {
+                IsExtraLogged = true,
+                Email = loggedUser.Email,
+                FullName = loggedUser.FullName
+            };
+            var userExternalLogin = _userService.GetExternalLogin(userGoogleCredentials.id);
+            // If it's first time user being registered with facebook
+            if (userExternalLogin == null)
+            {
+                userClientData.Token = _userService.Register(loggedUser).Token;
+                _userService.AddExternalLogin(new UserExternalLogin()
+                {
+                    UserId = loggedUser.Id,
+                    ProviderId = userGoogleCredentials.id,
+                    ProviderName = "Google"
                 });
                 return Ok(userClientData);
             }

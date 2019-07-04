@@ -25,6 +25,8 @@ namespace DAL.Migrations
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
+                    b.Property<DateTime>("CreatedDateTime");
+
                     b.Property<string>("Email");
 
                     b.Property<string>("FullName");
@@ -40,15 +42,17 @@ namespace DAL.Migrations
 
             modelBuilder.Entity("Model.Models.UserExternalLogin", b =>
                 {
-                    b.Property<long>("ProviderId")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("ProviderId");
 
                     b.Property<string>("ProviderName");
 
                     b.Property<int>("UserId");
 
-                    b.HasKey("ProviderId");
+                    b.HasKey("Id");
 
                     b.HasIndex("UserId");
 

@@ -1,17 +1,7 @@
 <template>
   <b-modal size="sm" :hide-footer="true" id="signUpModal" title="Sign Up">
     <h6>Sign Up using:</h6>
-    <div class="social-auth-links">
-      <a href="#" class="social-auth-link">
-        <img src="../img/facebook.svg">
-      </a>
-      <a href="#" class="social-auth-link">
-        <img src="../img/twitter.svg">
-      </a>
-      <a href="#" class="social-auth-link">
-        <img src="../img/google-plus.svg">
-      </a>
-    </div>
+    <SocialAuth/>
     <small>OR</small>
     <div class="auth-form-block">
       <b-form v-on:submit="logIn($event)" class="from-horizontal">
@@ -42,9 +32,10 @@
   </b-modal>
 </template>
 <script>
-import { mapGetters } from 'vuex'
-import store from '../../store'
-import axios from 'axios'
+import SocialAuth from './SocialAuth';
+import { mapGetters } from 'vuex';
+import store from '../../store';
+import axios from 'axios';
 
 export default {
   store,
@@ -52,6 +43,9 @@ export default {
     return {
       login: {Email: '', Password: '', Agreement: false}
     }
+  },
+  components: {
+    SocialAuth
   },
   computed: mapGetters({
     user: 'getUser'
@@ -67,28 +61,11 @@ export default {
           'Content-Type': 'application/json'
         }
       }).then(function (params) {
-        this.$store.commit('setUser', params.data)
-        sessionStorage.setItem('access_token', params.data.token)
+        that.$root.$emit('completeLogin', params.data);
       }).catch(function (params) {
-        console.log(params)
+        console.log(params);
       });
     }
   }
 }
 </script>
-<style scoped>
-.social-auth-links {
-  display: flex;
-  margin: 20px 0;
-}
-.social-auth-link {
-  width: 22%;
-  margin: 0 auto;
-}
-.social-auth-link img {
-  width: 100%;
-}
-p label[for="accept_terms"] {
-  font-size: 14px;
-}
-</style>

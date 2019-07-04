@@ -13,6 +13,7 @@ namespace Model.Models
         public string FullName { get; set; }
         public string Password { get; set; }
         public string Email { get; set; }
+        public DateTime CreatedDateTime { get; set; }
         public bool IsExtraLogged { get; set; }
 
         public ICollection<UserSession> UserSessions { get; set; }
@@ -30,8 +31,8 @@ namespace Model.Models
     public class UserExternalLogin
     {
         [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.None)]
-        public long ProviderId { get; set; }
+        public int Id { get; set; }
+        public string ProviderId { get; set; }
         public string ProviderName { get; set; }
         [ForeignKey("UserId")]
         public int UserId { get; set; }
@@ -60,11 +61,19 @@ namespace Model.Models
         public DateTime ExpiryDateTime { get; set; }
     }
 
-    public class FacebookCredentials
+    public class UserFacebookCredentials
     { 
         public string email { get; set; }
         public string name { get; set; }
         // Provider ID
-        public long id { get; set; }
+        public string id { get; set; }
+    }
+    public class UserGoogleCredentials
+    { 
+        public string email { get; set; }
+        public string name { get; set; }
+        public string sub { get; set; }
+        // Provider ID
+        public string id => sub;
     }
 }

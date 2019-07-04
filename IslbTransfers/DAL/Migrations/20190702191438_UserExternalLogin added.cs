@@ -7,24 +7,21 @@ namespace DAL.Migrations
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AddColumn<bool>(
-                name: "IsExtraLogged",
-                table: "Users",
-                nullable: false,
-                defaultValue: false);
+
 
             migrationBuilder.CreateTable(
                 name: "UserExternalLogins",
                 columns: table => new
                 {
-                    ProviderId = table.Column<long>(nullable: false)
+                    Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    ProviderId = table.Column<string>(nullable: true),
                     ProviderName = table.Column<string>(nullable: true),
                     UserId = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_UserExternalLogins", x => x.ProviderId);
+                    table.PrimaryKey("PK_UserExternalLogins", x => x.Id);
                     table.ForeignKey(
                         name: "FK_UserExternalLogins_Users_UserId",
                         column: x => x.UserId,
@@ -43,10 +40,6 @@ namespace DAL.Migrations
         {
             migrationBuilder.DropTable(
                 name: "UserExternalLogins");
-
-            migrationBuilder.DropColumn(
-                name: "IsExtraLogged",
-                table: "Users");
         }
     }
 }
