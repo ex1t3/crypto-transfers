@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using DAL;
 using DAL.DbRepository;
+using IslbTransfers.CustomAttributes;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -14,6 +16,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
@@ -63,25 +66,20 @@ namespace IslbTransfers
                 });
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
             services.AddScoped<IUserService, UserService>();
+            services.AddScoped<SessionAuthorizeAttribute>();
             services.AddScoped<IDbRepository<User>, DbRepository<User>>();
             services.AddScoped<IDbRepository<UserSession>, DbRepository<UserSession>>();
             services.AddScoped<IDbRepository<UserExternalLogin>, DbRepository<UserExternalLogin>>();
             services.AddScoped<IDbFactory, DbFactory>();
         }
 
-        private IServiceCollection ConfigureOAuthAuthentication(IServiceCollection services)
-        {
-            services.AddAuthentication();
-            return services;
-        }
-
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
 
+            app.UseDeveloperExceptionPage();
             if (env.IsDevelopment())
             {
-                app.UseDeveloperExceptionPage();
             }
             else
             {
@@ -97,6 +95,12 @@ namespace IslbTransfers
                 .AllowAnyHeader());
 
             app.UseStaticFiles();
+            app.UseStaticFiles(new StaticFileOptions
+            {
+                FileProvider = new PhysicalFileProvider(
+                    Path.Combine(Directory.GetCurrentDirectory(), "UserUploads")),
+                RequestPath = "/uploads"
+            });
             app.UseMvc();
             app.UseHttpsRedirection();
             app.UseMvcWithDefaultRoute();

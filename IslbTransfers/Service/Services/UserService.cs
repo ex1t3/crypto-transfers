@@ -29,7 +29,12 @@ namespace Service.Services
         void AddSession(int userId, string token);
         void Update(User user);
         void AddExternalLogin(UserExternalLogin login);
-        UserExternalLogin GetExternalLogin(string id);
+        UserExternalLogin GetExternalLogin(string id, string name);
+        void DeleteExpiredUserSessions();
+        void InValidateUserSession(int userId, string token);
+        bool ReValidateUserSession(string token, string email);
+        void AddIdentity(UserIdentityKyc userIdentity);
+        string GenerateSocketToken(int userId);
     }
     public class UserService : IUserService
     {
@@ -37,6 +42,9 @@ namespace Service.Services
         private readonly IDbRepository<UserSession> _sessionRepository;
         private readonly IDbRepository<UserExternalLogin> _externalLoginRepository;
         private readonly OAuthSettings _oauthOptions;
+
+        private readonly int _defaultUserSessionTimeOut = 7;
+        private readonly string _secureCode = "some_secure_code_#refJHJFHcnn212"; //TODO: The more protected salt needed to be implemented in secure reasons
 
         public UserService(IDbRepository<User> userRepository, IOptions<OAuthSettings> oauthOptions, IDbRepository<UserSession> sessionRepository, IDbRepository<UserExternalLogin> externalLoginRepository)
         {
@@ -52,18 +60,39 @@ namespace Service.Services
             // If login successful generate JWT token
             var token = GenerateToken(user);
 
+            // Delete session that have expired
+            DeleteExpiredUserSessions();
+
             // Add a new user's session
             AddSession(user.Id, token);
 
             var userClientData = new UserClientData()
             {
                 Email = user.Email,
-                FullName = user.FullName,
-                Token = token,
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                AccessToken = token,
+                SocketToken = GenerateSocketToken(user.Id)
 
             };
             return userClientData;
 
+        }
+
+        public string GenerateSocketToken(int userId)
+        {
+            StringBuilder sb = new StringBuilder();
+
+            using (SHA256 hash = SHA256.Create())
+            {
+                Encoding enc = Encoding.UTF8;
+                Byte[] result = hash.ComputeHash(enc.GetBytes(userId + _secureCode));
+
+                foreach (Byte b in result)
+                    sb.Append(b.ToString("x2"));
+            }
+
+            return sb.ToString();
         }
 
         // Check if user data is correct
@@ -97,12 +126,12 @@ namespace Service.Services
                 SecurityAlgorithms.HmacSha256Signature);
             var tokenDescriptor = new SecurityTokenDescriptor
             {
-                Subject = new ClaimsIdentity(new Claim[]
+                Subject = new ClaimsIdentity(new[]
                 {
                     new Claim(ClaimTypes.Name, user.Email),
                     new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
                 }),
-                Expires = DateTime.UtcNow.AddDays(7),
+                Expires = DateTime.UtcNow.AddDays(_defaultUserSessionTimeOut),
                 SigningCredentials = credentials
             };
             return tokenHandler.WriteToken(tokenHandler.CreateToken(tokenDescriptor));
@@ -151,11 +180,57 @@ namespace Service.Services
             var session = new UserSession()
             {
                 UserId = userId,
-                ExpiryDateTime = DateTime.UtcNow.AddDays(7),
+                ExpiryDateTime = DateTime.UtcNow.AddDays(_defaultUserSessionTimeOut),
                 Token = token
             };
             _sessionRepository.Add(session);
 
+        }
+
+        // Extend user's session if it is valid
+        public bool ReValidateUserSession(string token, string email)
+        {
+            var currentUserId = GetByEmail(email)?.Id;
+            var userSession = _sessionRepository.Get(x => x.UserId == currentUserId && x.Token == token);
+
+            if (userSession == null)
+            {
+                // User does not have a session with this token --> invalid session
+                return false;
+            }
+
+            if (userSession.ExpiryDateTime < DateTime.Now)
+            {
+                // User's session is expired --> invalid session
+                return false;
+            }
+
+            // Extend the lifetime of the current user's session: current moment + fixed timeout
+            userSession.ExpiryDateTime = DateTime.Now.AddDays(_defaultUserSessionTimeOut);
+            _sessionRepository.Update(userSession);
+
+            return true;
+        }
+
+        public void AddIdentity(UserIdentityKyc userIdentity)
+        {
+            ;
+        }
+
+        // Delete specific user's session from DB
+        public void InValidateUserSession(int userId, string token)
+        {
+            var userSession = _sessionRepository.Get(x => x.UserId == userId && x.Token == token);
+            if (userSession != null)
+            {
+                _sessionRepository.Delete(userSession);
+            }
+        }
+
+        // Delete all the session with expired date time
+        public void DeleteExpiredUserSessions()
+        {
+            _sessionRepository.Delete(x => x.ExpiryDateTime > DateTime.Now);
         }
 
         // Update specific user in DB
@@ -164,14 +239,16 @@ namespace Service.Services
             _userRepository.Update(user);
         }
 
+        // Add record about new external login to DB
         public void AddExternalLogin(UserExternalLogin login)
         {
             _externalLoginRepository.Add(login);
         }
 
-        public UserExternalLogin GetExternalLogin(string id)
+        // Get specific external login from DB
+        public UserExternalLogin GetExternalLogin(string id, string name)
         {
-            return _externalLoginRepository.Get(x=>x.ProviderId == id);
+            return _externalLoginRepository.Get(x => x.ProviderId == id && x.ProviderName == name);
         }
 
         // Pull user login data via Facebook API
@@ -184,12 +261,12 @@ namespace Service.Services
                     {"access_token",token}
                 };
                 var httpResponse = await http.PostAsync(
-                    "https://graph.facebook.com/v2.8/me?fields=id,email,first_name,last_name,name,gender,locale,birthday,picture",
+                    "https://graph.facebook.com/v2.8/me?fields=id,email,first_name,last_name,gender,locale,birthday,picture",
                     new FormUrlEncodedContent(postData));
                 if (httpResponse.StatusCode != HttpStatusCode.OK) return null;
                 var resultsData = httpResponse.Content.ReadAsStringAsync().Result;
                 var fbCredentials = JsonConvert.DeserializeObject<UserFacebookCredentials>(resultsData);
-                return CheckCredentialsForValidity(fbCredentials.email, fbCredentials.id) ? fbCredentials : null;
+                return CheckCredentialsForValidity(fbCredentials.Email, fbCredentials.Id) ? fbCredentials : null;
             }
         }
 
@@ -208,7 +285,7 @@ namespace Service.Services
                 if (httpResponse.StatusCode != HttpStatusCode.OK) return null;
                 var resultsData = httpResponse.Content.ReadAsStringAsync().Result;
                 var googleCredentials = JsonConvert.DeserializeObject<UserGoogleCredentials>(resultsData);
-                return CheckCredentialsForValidity(googleCredentials.email, googleCredentials.id) ? googleCredentials : null;
+                return CheckCredentialsForValidity(googleCredentials.Email, googleCredentials.Id) ? googleCredentials : null;
             }
         }
 

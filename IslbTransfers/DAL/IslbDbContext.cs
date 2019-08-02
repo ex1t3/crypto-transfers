@@ -13,11 +13,15 @@ namespace DAL
     {
         protected override void OnConfiguring(DbContextOptionsBuilder builder)
         {
-            builder.UseSqlServer("Server=(localdb)\\mssqllocaldb;Database=ISLB_DB;Trusted_Connection=True;");
+            //builder.UseSqlServer("Server=(localdb)\\mssqllocaldb;Database=ISLB_DB;Trusted_Connection=True;");
+
+            /* FOR REMOTE */
+            builder.UseSqlServer("Server=db0.islb.one,1443;Database=islb_pay;User Id=islb_pay;Password=xJMGf88big;"); 
             base.OnConfiguring(builder);
         }
         public DbSet<User> Users { get; set; }
         public DbSet<UserSession> UserSessions { get; set; }
         public DbSet<UserExternalLogin> UserExternalLogins { get; set; }
+        public DbSet<UserIdentityKyc> UserIdentityKycs { get; set; }
     }
 }

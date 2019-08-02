@@ -3,7 +3,7 @@ let assetsDir = "dist";
 
 module.exports = {
   devServer: {
-    https: true
+    https: false
   },
   outputDir: path.resolve(__dirname, "./IslbTransfers/IslbTransfers/wwwroot/"),
   configureWebpack: {

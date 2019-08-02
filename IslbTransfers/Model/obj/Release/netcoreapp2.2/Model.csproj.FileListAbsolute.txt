@@ -1,0 +1,9 @@
+E:\wamp64\www\islb-transfers\ISLBTransfers\Model\bin\Release\netcoreapp2.2\Model.deps.json
+E:\wamp64\www\islb-transfers\ISLBTransfers\Model\bin\Release\netcoreapp2.2\Model.dll
+E:\wamp64\www\islb-transfers\ISLBTransfers\Model\bin\Release\netcoreapp2.2\Model.pdb
+E:\wamp64\www\islb-transfers\ISLBTransfers\Model\obj\Release\netcoreapp2.2\Model.csprojAssemblyReference.cache
+E:\wamp64\www\islb-transfers\ISLBTransfers\Model\obj\Release\netcoreapp2.2\Model.csproj.CoreCompileInputs.cache
+E:\wamp64\www\islb-transfers\ISLBTransfers\Model\obj\Release\netcoreapp2.2\Model.AssemblyInfoInputs.cache
+E:\wamp64\www\islb-transfers\ISLBTransfers\Model\obj\Release\netcoreapp2.2\Model.AssemblyInfo.cs
+E:\wamp64\www\islb-transfers\ISLBTransfers\Model\obj\Release\netcoreapp2.2\Model.dll
+E:\wamp64\www\islb-transfers\ISLBTransfers\Model\obj\Release\netcoreapp2.2\Model.pdb

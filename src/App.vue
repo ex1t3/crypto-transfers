@@ -1,23 +1,30 @@
 <template>
   <div id="app">
     <Header/>
+    <Alert/>
     <Modals/>
     <router-view/>
+    <Footer/>
   </div>
 </template>
 <script>
 import Vue from "vue";
+
 import BootstrapVue from "bootstrap-vue";
 Vue.use(BootstrapVue);
 import "bootstrap/dist/css/bootstrap.css";
 import "bootstrap-vue/dist/bootstrap-vue.css";
 
-import Header from "./components/FooterHeaderBlock/HeaderBlock";
+import Header from "./components/Header";
 import Modals from "./components/Modals/MainModals";
+import Footer from "./components/Footer";
+import Alert from "./components/Alert";
 export default {
   components: {
     Header,
-    Modals
+    Modals,
+    Footer,
+    Alert
   }
 };
 </script>
@@ -34,28 +41,13 @@ h6 {
 }
 body {
   background: #fafafa;
+  font-size: 14px;
 }
 a {
   font-weight: 600;
 }
-.btn-primary {
-  color: #ffffff;
-  background-color: #4b41ab;
-  border-color: #4b41ab;
-}
-.btn-primary:hover {
-  background-color: #3d2798;
-  border-color: #3d2798;
-}
-.btn-primary:not(:disabled):not(.disabled):active:focus {
-  box-shadow: 0 0 0 0.2rem rgba(104, 93, 199, 0.27);
-}
-.btn-primary:not(:disabled):not(.disabled):focus {
-  box-shadow: 0 0 0 0.2rem rgba(104, 93, 199, 0.27);
-}
-.btn-primary:not(:disabled):not(.disabled):active {
-  background-color: #7369c8;
-  border-color: #7369c8;
+.form-control {
+  font-size: 14px;
 }
 .form-control:focus {
   border-color: #08023e;
@@ -63,7 +55,7 @@ a {
 }
 .form-control::placeholder {
   font-weight: 300;
-  color: #ddd;
+  color: #777;
 }
 .input-lg {
   height: 48px;
@@ -85,6 +77,7 @@ a {
 .col-sm-8,
 .col-sm-10 {
   float: left;
+  margin-bottom: 10px;
 }
 .centered {
   text-align: center;
@@ -96,17 +89,6 @@ a {
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
-}
-#nav {
-  padding: 30px;
-}
-#nav a {
-  font-weight: bold;
-  color: #2c3e50;
-}
-
-#nav a.router-link-exact-active {
-  color: #42b983;
 }
 @media (max-width: 700px){
   h2 {

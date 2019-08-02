@@ -6,19 +6,17 @@
     <TransactionSpeeds/>
     <Video/>
     <FrequentlyAskedQuestions/>
-    <Footer/>
   </div>
 </template>
 
 <script>
 // @ is an alias to /src
-import CryptoTransfers from "@/components/CryptoTransfersBlock/MainCryptoTransfersBlock";
-import CurrencyRates from "@/components/ContentBlock/CurrencyRatesBlock";
-import TransferStatus from "@/components/ContentBlock/TransferStatusBlock";
-import TransactionSpeeds from "@/components/ContentBlock/TransactionSpeedsBlock";
-import Video from "@/components/ContentBlock/VideoBlock";
-import FrequentlyAskedQuestions from "@/components/ContentBlock/FrequentlyAskedQuestionsBlock";
-import Footer from "@/components/FooterHeaderBlock/FooterBlock";
+import CryptoTransfers from "@/components/Home/MainCryptoTransfersBlock";
+import CurrencyRates from "@/components/Home/CurrencyRatesBlock";
+import TransferStatus from "@/components/Home/TransferStatusBlock";
+import TransactionSpeeds from "@/components/Home/TransactionSpeedsBlock";
+import Video from "@/components/Home/VideoBlock";
+import FrequentlyAskedQuestions from "@/components/Home/FrequentlyAskedQuestionsBlock";
 
 export default {
   name: "Home",
@@ -28,8 +26,7 @@ export default {
     TransferStatus,
     TransactionSpeeds,
     Video,
-    FrequentlyAskedQuestions,
-    Footer
+    FrequentlyAskedQuestions
   }
 };
 </script>

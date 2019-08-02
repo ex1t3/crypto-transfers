@@ -11,6 +11,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Folder Include="UserUploads\" />
     <Folder Include="Pages\Shared\" />
     <Folder Include="wwwroot\" />
   </ItemGroup>

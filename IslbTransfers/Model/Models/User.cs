@@ -2,28 +2,32 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Text;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using Newtonsoft.Json;
 
 namespace Model.Models
 {
     public class User
     {
         public int Id { get; set; }
-        public string FullName { get; set; }
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
         public string Password { get; set; }
         public string Email { get; set; }
+        public string ProfilePicture { get; set; }
         public DateTime CreatedDateTime { get; set; }
         public bool IsExtraLogged { get; set; }
 
         public ICollection<UserSession> UserSessions { get; set; }
         public ICollection<UserExternalLogin> UserExternalLogins { get; set; }
+        public ICollection<UserIdentityKyc> UserIdentityKycs { get; set; }
     }
 
     public class UserClientData
     {
-        public string FullName { get; set; }
-        public string Token { get; set; }
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
+        public string AccessToken { get; set; }
+        public string SocketToken { get; set; }
         public string Email { get; set; }
         public bool IsExtraLogged { get; set; }
     }
@@ -47,8 +51,6 @@ namespace Model.Models
         [Required(ErrorMessage = "The Email address is required")]
         [EmailAddress(ErrorMessage = "Invalid Email address")]
         public string Email { get; set; }
-
-        public string Fullname { get; set; }
     }
 
     public class UserSession
@@ -61,19 +63,50 @@ namespace Model.Models
         public DateTime ExpiryDateTime { get; set; }
     }
 
-    public class UserFacebookCredentials
-    { 
-        public string email { get; set; }
-        public string name { get; set; }
-        // Provider ID
-        public string id { get; set; }
+    public class UserIdentityKyc
+    {
+        [Key]
+        public int Id { get; set; }
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
+        public string PassportCode { get; set; }
+        public string Address { get; set; }
+        public string City { get; set; }
+        public string Country { get; set; }
+        public string PhoneNumber { get; set; }
+        [ForeignKey("UserId")]
+        public int UserId { get; set; }
+        public string ZipCode { get; set; }
+        public string Region { get; set; }
+        public DateTime BirthDate { get; set; }
+        public DateTime RecordCreatedTime { get; set; }
+        public bool IsConfirmed { get; set; }
+
     }
-    public class UserGoogleCredentials
+
+    public class UserFacebookCredentials : OAuthApiCredentials
     { 
-        public string email { get; set; }
-        public string name { get; set; }
-        public string sub { get; set; }
-        // Provider ID
-        public string id => sub;
+        
+    }
+    public class UserGoogleCredentials : OAuthApiCredentials
+    {
+        [JsonProperty(PropertyName = "sub")]
+        public new string Id { get; set; }
+        [JsonProperty(PropertyName = "given_name")]
+        public new string FirstName { get; set; }
+        [JsonProperty(PropertyName = "family_name")]
+        public new string LastName { get; set; }
+    }
+
+    public class OAuthApiCredentials
+    {
+        [JsonProperty(PropertyName = "email")]
+        public string Email { get; set; }
+        [JsonProperty(PropertyName = "first_name")]
+        public string FirstName { get; set; }
+        [JsonProperty(PropertyName = "last_name")]
+        public string LastName { get; set; }
+        [JsonProperty(PropertyName = "id")]
+        public string Id { get; set; }
     }
 }
