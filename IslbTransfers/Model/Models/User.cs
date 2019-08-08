@@ -13,13 +13,24 @@ namespace Model.Models
         public string LastName { get; set; }
         public string Password { get; set; }
         public string Email { get; set; }
+        public bool IsEmailVerified { get; set; }
         public string ProfilePicture { get; set; }
         public DateTime CreatedDateTime { get; set; }
         public bool IsExtraLogged { get; set; }
 
-        public ICollection<UserSession> UserSessions { get; set; }
-        public ICollection<UserExternalLogin> UserExternalLogins { get; set; }
-        public ICollection<UserIdentityKyc> UserIdentityKycs { get; set; }
+        public ICollection<UserSession> Sessions { get; set; }
+        public ICollection<UserExternalLogin> ExternalLogins { get; set; }
+        public ICollection<UserIdentityKyc> IdentityKycs { get; set; }
+        public ICollection<UserWallet> Wallets { get; set; }
+    }
+
+    public class UserWallet
+    {
+        [Key]
+        [ForeignKey("UserId")]
+        public int UserId { get; set; }
+        public string BTC { get; set; }
+        public string ETH { get; set; }
     }
 
     public class UserClientData
@@ -30,6 +41,8 @@ namespace Model.Models
         public string SocketToken { get; set; }
         public string Email { get; set; }
         public bool IsExtraLogged { get; set; }
+        public UserIdentityViewModel Identity { get; set; }
+        public UserWallet Wallets { get; set; }
     }
 
     public class UserExternalLogin
@@ -73,20 +86,45 @@ namespace Model.Models
         public string Address { get; set; }
         public string City { get; set; }
         public string Country { get; set; }
+        
         public string PhoneNumber { get; set; }
+
         [ForeignKey("UserId")]
         public int UserId { get; set; }
         public string ZipCode { get; set; }
         public string Region { get; set; }
+        
         public DateTime BirthDate { get; set; }
+
         public DateTime RecordCreatedTime { get; set; }
         public bool IsConfirmed { get; set; }
 
     }
 
+    public class UserIdentityViewModel
+    {
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
+        public string PassportCode { get; set; }
+        public string Address { get; set; }
+        public string City { get; set; }
+        public string Country { get; set; }
+
+        public string DialCode;
+        public string Number;
+
+        public string ZipCode { get; set; }
+        public string Region { get; set; }
+
+        public int Year;
+        public int Month;
+        public int Day;
+
+    }
+
     public class UserFacebookCredentials : OAuthApiCredentials
-    { 
-        
+    {
+
     }
     public class UserGoogleCredentials : OAuthApiCredentials
     {

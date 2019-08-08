@@ -4,7 +4,9 @@ E:\wamp64\www\islb-transfers\ISLBTransfers\DAL\bin\Debug\netcoreapp2.2\DAL.runti
 E:\wamp64\www\islb-transfers\ISLBTransfers\DAL\bin\Debug\netcoreapp2.2\DAL.dll
 E:\wamp64\www\islb-transfers\ISLBTransfers\DAL\bin\Debug\netcoreapp2.2\DAL.pdb
 E:\wamp64\www\islb-transfers\ISLBTransfers\DAL\bin\Debug\netcoreapp2.2\Model.dll
+E:\wamp64\www\islb-transfers\ISLBTransfers\DAL\bin\Debug\netcoreapp2.2\Microsoft.AspNetCore.Mvc.Abstractions.dll
 E:\wamp64\www\islb-transfers\ISLBTransfers\DAL\bin\Debug\netcoreapp2.2\Model.pdb
+E:\wamp64\www\islb-transfers\ISLBTransfers\DAL\bin\Debug\netcoreapp2.2\Microsoft.AspNetCore.Mvc.Abstractions.xml
 E:\wamp64\www\islb-transfers\ISLBTransfers\DAL\obj\Debug\netcoreapp2.2\DAL.csprojAssemblyReference.cache
 E:\wamp64\www\islb-transfers\ISLBTransfers\DAL\obj\Debug\netcoreapp2.2\DAL.csproj.CoreCompileInputs.cache
 E:\wamp64\www\islb-transfers\ISLBTransfers\DAL\obj\Debug\netcoreapp2.2\DAL.AssemblyInfoInputs.cache

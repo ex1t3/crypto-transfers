@@ -30,8 +30,8 @@ export default {
     window.addEventListener("GOOG_SDK_READY", this.onGoogReady);
   },
   beforeDestroy() {
-    window.removeEventListener("FB_SDK_READY");
-    window.removeEventListener("GOOG_SDK_READY");
+    window.removeEventListener("FB_SDK_READY", this.onFbReady);
+    window.removeEventListener("GOOG_SDK_READY", this.onGoogReady);
   },
   methods: {
     onFbReady() {

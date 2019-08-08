@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
+using AutoMapper;
 using DAL.DbRepository;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
@@ -19,14 +21,12 @@ namespace Service.Services
     {
         UserClientData Authenticate(User user);
         UserClientData Register(User user);
+        UserClientData GetClientData(User user, string token = null);
         User CheckForUserIdentity(string email, string password);
         User GetByEmail(string email);
         Task<UserFacebookCredentials> GetUserDataViaFacebook(string token);
         Task<UserGoogleCredentials> GetUserDataViaGoogle(string token);
         string HashPassword(string password);
-        bool CheckHash(string typedPassword, string storedPassword);
-        void Add(User user);
-        void AddSession(int userId, string token);
         void Update(User user);
         void AddExternalLogin(UserExternalLogin login);
         UserExternalLogin GetExternalLogin(string id, string name);
@@ -34,23 +34,30 @@ namespace Service.Services
         void InValidateUserSession(int userId, string token);
         bool ReValidateUserSession(string token, string email);
         void AddIdentity(UserIdentityKyc userIdentity);
-        string GenerateSocketToken(int userId);
+        UserIdentityKyc GetIdentity(int userId);
+        UserWallet GetWallets(int userId);
     }
     public class UserService : IUserService
     {
         private readonly IDbRepository<User> _userRepository;
         private readonly IDbRepository<UserSession> _sessionRepository;
         private readonly IDbRepository<UserExternalLogin> _externalLoginRepository;
+        private readonly IDbRepository<UserIdentityKyc> _userIdentityRepository;
+        private readonly IDbRepository<UserWallet> _userWalletRepository;
+        private readonly IMapper _mapper;
         private readonly OAuthSettings _oauthOptions;
 
         private readonly int _defaultUserSessionTimeOut = 7;
-        private readonly string _secureCode = "some_secure_code_#refJHJFHcnn212"; //TODO: The more protected salt needed to be implemented in secure reasons
+        private readonly string _secureCode = "some_secure_code_#refJHJFHcnn212"; //TODO: More protected code need to be implemented in secure reasons
 
-        public UserService(IDbRepository<User> userRepository, IOptions<OAuthSettings> oauthOptions, IDbRepository<UserSession> sessionRepository, IDbRepository<UserExternalLogin> externalLoginRepository)
+        public UserService(IDbRepository<User> userRepository, IOptions<OAuthSettings> oauthOptions, IDbRepository<UserSession> sessionRepository, IDbRepository<UserExternalLogin> externalLoginRepository, IDbRepository<UserIdentityKyc> userIdentityRepository, IMapper mapper, IDbRepository<UserWallet> userWalletRepository)
         {
             this._userRepository = userRepository;
             _sessionRepository = sessionRepository;
             _externalLoginRepository = externalLoginRepository;
+            _userIdentityRepository = userIdentityRepository;
+            _mapper = mapper;
+            _userWalletRepository = userWalletRepository;
             _oauthOptions = oauthOptions.Value;
         }
 
@@ -66,17 +73,18 @@ namespace Service.Services
             // Add a new user's session
             AddSession(user.Id, token);
 
-            var userClientData = new UserClientData()
-            {
-                Email = user.Email,
-                FirstName = user.FirstName,
-                LastName = user.LastName,
-                AccessToken = token,
-                SocketToken = GenerateSocketToken(user.Id)
+            return GetClientData(user, token);
 
-            };
-            return userClientData;
+        }
 
+        public UserIdentityKyc GetIdentity(int userId)
+        {
+            return _userIdentityRepository.Get(x => x.UserId == userId);
+        }
+
+        public UserWallet GetWallets(int userId)
+        {
+            return _userWalletRepository.Get(x => x.UserId == userId);
         }
 
         public string GenerateSocketToken(int userId)
@@ -96,6 +104,21 @@ namespace Service.Services
         }
 
         // Check if user data is correct
+        public UserClientData GetClientData(User user, string token = null)
+        {
+            var mappedIdentity = _mapper.Map<UserIdentityViewModel>(GetIdentity(user.Id) ?? new UserIdentityKyc());
+            return new UserClientData()
+            {
+                Email = user.Email,
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                AccessToken = token,
+                SocketToken = GenerateSocketToken(user.Id),
+                Identity = mappedIdentity,
+                Wallets = GetWallets(user.Id) ?? new UserWallet()
+            };
+        }
+
         public User CheckForUserIdentity(string email, string password)
         {
             var user = GetByEmail(email); // check if user exists
@@ -214,7 +237,7 @@ namespace Service.Services
 
         public void AddIdentity(UserIdentityKyc userIdentity)
         {
-            ;
+            _userIdentityRepository.Add(userIdentity);
         }
 
         // Delete specific user's session from DB

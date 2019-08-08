@@ -1,5 +1,4 @@
 <template>
-  <div class="personal-info-block main-page-block">
     <b-form v-on:submit="submitIdentity($event)">
       <div class="col-sm-6">
         <div class="form-group left">
@@ -7,16 +6,14 @@
           <div class="single-line-group">
             <input
               placeholder="First Name"
-              name="FirstName"
-              v-model="user.firstName"
+              v-model="user.identity.firstName"
               required
               class="form-control cell-6"
               type="text"
             />
             <input
               placeholder="Last Name"
-              name="LastName"
-              v-model="user.lastName"
+              v-model="user.identity.lastName"
               required
               class="form-control cell-6"
               type="text"
@@ -27,27 +24,27 @@
           <label>Birth Date</label>
           <div class="single-line-group">
             <input
-              placeholder="year"
+              placeholder="Year"
+              v-model="user.identity.year"
               required
-              name="Year"
               class="form-control cell-4"
               min="1900"
               :max="(new Date).getFullYear() - 18"
               type="number"
             />
             <input
-              placeholder="month"
+              placeholder="Month"
+              v-model="user.identity.month"
               required
-              name="Month"
               class="form-control cell-4"
               min="1"
               max="12"
               type="number"
             />
             <input
-              placeholder="day"
+              placeholder="Day"
+              v-model="user.identity.day"
               required
-              name="Day"
               class="form-control cell-4"
               min="1"
               max="31"
@@ -58,8 +55,8 @@
         <div class="form-group left">
           <label>Phone Number</label>
           <div class="single-line-group">
-            <select name="DialCode" required class="cell-4 form-control">
-              <option value selected disabled>Dial code</option>
+            <select v-model="user.identity.dialCode" required class="cell-4 form-control">
+              <option value="" selected disabled>Dial code</option>
               <option
                 v-for="(item, index) in countries"
                 :key="index"
@@ -67,8 +64,8 @@
               >{{ item.code + ' (' + item.dial_code + ')' }}</option>
             </select>
             <input
-              placeholder="Number"
-              name="Phone"
+              placeholder="Number"    
+              v-model="user.identity.number"
               required
               class="cell-8 form-control"
               type="text"
@@ -80,7 +77,7 @@
           <div class="single-line-group">
             <input
               placeholder="Passport Code"
-              name="PassportCode"
+              v-model="user.identity.passportCode"
               required
               class="cell-6 form-control"
               type="text"
@@ -122,15 +119,15 @@
         <div class="form-group left">
           <label>Residence</label>
           <div class="single-line-group">
-            <select name="Country" required class="form-control cell-6">
-              <option value disabled selected>Country</option>
+            <select v-model="user.identity.country" required class="form-control cell-6">
+              <option value selected disabled>Country</option>
               <option :value="item.name" :key="index" v-for="(item, index) in countries">{{ item.name }}</option>
             </select>
 
             <input
               required
+              v-model="user.identity.zipCode"
               class="form-control cell-6"
-              name="ZipCode"
               placeholder="ZIP-Code"
               type="text"
             />
@@ -138,29 +135,30 @@
         </div>
         <div class="form-group left">
           <label>Region / Province</label>
-          <input required class="form-control" name="Region" placeholder="Region" type="text" />
+          <input required class="form-control" v-model="user.identity.region" placeholder="Region" type="text" />
         </div>
         <div class="form-group left">
           <label>City</label>
-          <input required class="form-control" name="City" placeholder="City" type="text" />
+          <input required class="form-control" v-model="user.identity.city" placeholder="City" type="text" />
         </div>
         <div class="form-group left">
           <label>Home Address</label>
-          <input required class="form-control" name="Address" placeholder="Street" type="text" />
+          <input required class="form-control" v-model="user.identity.address" placeholder="Street" type="text" />
         </div>
       </div>
 
-      <div class="form-group centered">
-        <b-btn type="submit" class="btn-primary">Confirm Identity</b-btn>
+      <div class="form-group col-sm-6 offset-md-3 centered">
+        <b-btn type="submit" class="btn-primary btn-block">Confirm Identity</b-btn>
       </div>
     </b-form>
-  </div>
 </template>
 <script>
 import { mapGetters } from "vuex";
+import store from '../../store'
 import axios from "axios";
 import countries from "../../data/countries.json";
 export default {
+  store,
   data() {
     return {
       countries: countries,
@@ -174,28 +172,30 @@ export default {
   methods: {
     submitIdentity(event) {
       event.preventDefault();
-      let formData = new FormData(event.target);
-      let data = {};
-      formData.forEach(function(v, k) {
-        data[k] = v;
-      });
-      data["PhoneNumber"] = '(' + data["DialCode"] + ')-' + data["Phone"];
-      data["BirthDate"] =
-        data["Year"] + "/" + data["Month"] + "/" + data["Day"];
+      // let formData = new FormData(event.target);
+      // let data = {};
+      // formData.forEach(function(v, k) {
+      //   data[k] = v;
+      // });
+      // data["PhoneNumber"] = '(' + data["DialCode"] + ')-' + data["Phone"];
+      // data["BirthDate"] =
+      //   data["Year"] + "/" + data["Month"] + "/" + data["Day"];
       let that = this;
       axios({
         method: "POST",
         url: "https://localhost:44357/api/account/identity",
-        data: data,
+        data: this.user.identity,
         headers: {
           Authorization: "Bearer " + localStorage.getItem("access_token")
         }
       })
         .then(response => {
-          
+          that.$store.dispatch('addAlert', response.data.message)
         })
         .catch(error => {
-          console.log(error);
+          if (typeof error.data === 'object') {  
+            that.$store.dispatch('addAlert', response.data)
+          }
         });
     },
     handleUpload(index) {
@@ -226,6 +226,9 @@ export default {
         .catch(error => {
           console.log(error);
           that.progressWidth = "";
+          if (typeof error.data === 'object') {  
+            that.$store.dispatch('addAlert', response.data)
+          }
         });
     },
     deletePhoto(index) {
@@ -292,6 +295,7 @@ export default {
   height: 100%;
   position: absolute;
   z-index: 2;
+  transition: .3s;
   left: 0;
   color: #fff;
   top: 0;

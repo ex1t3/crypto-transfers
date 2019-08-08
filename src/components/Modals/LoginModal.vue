@@ -94,12 +94,13 @@ export default {
         });
     },
     completeLogin(data) {
-      this.$store.dispatch("setUser", data);
+      this.$store.dispatch("setUser", data.data);
       this.$store.dispatch("setLoginState", true);
-      localStorage.setItem("access_token", data.accessToken);
+      localStorage.setItem("access_token", data.data.accessToken);
       this.$root.$emit("bv::hide::modal", "loginModal");
       this.$root.$emit("bv::hide::modal", "signUpModal");
-      this.$store.dispatch('addAlert', {message: 'Login successful', type: 'success', duration: 3000})
+      console.log(data);
+      this.$store.dispatch('addAlert', data.message)
     }
   }
 };

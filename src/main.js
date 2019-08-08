@@ -21,7 +21,7 @@ const mutations = {
   SOCKET_RECONNECT_ERROR
 };
 
-Vue.use(socket, "ws://10.90.90.41:4443/demo", {
+Vue.use(socket, "wss://m.islb.one:4443/demo", {
   store: store,
   mutations: mutations,
   connectManually: true,

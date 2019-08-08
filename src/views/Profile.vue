@@ -1,13 +1,11 @@
 <template>
   <b-container>
-      <div class="content-page">
     <b-row>
       <Sidebar :items="{sidebarItems}" />
     </b-row>
     <b-row>
       <Content :items="{sidebarItems}" />
     </b-row>
-    </div>
   </b-container>
 </template>
 <script>
@@ -44,12 +42,5 @@ export default {
   }
 };
 </script>
-<style scoped>
-.content-page {
-  width: 100%;
-  padding-top: 100px;
-  min-height: 70vh;
-}
-</style>
 
 

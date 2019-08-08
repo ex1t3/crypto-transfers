@@ -1,51 +1,39 @@
 <script>
 import store from "../store";
 import axios from "axios";
-import { mapGetters } from 'vuex';
+import { mapGetters } from "vuex";
 export default {
+  store,
   computed: mapGetters({
     isLoggedIn: "getLoginState",
+    isPageLoaded: "isPageLoaded"
   }),
   beforeMount () {
-    let token = localStorage.getItem("access_token");
-    let that = this;
-    if (token != null) {
-      axios({
-        method: "GET",
-        url: "https://localhost:44357/api/account/check",
-        headers: {
-          Authorization: "Bearer " + token
-        }
-      })
-        .then(params => {
-          if (this.isLoggedIn) return;
-          that.$store.dispatch("setUser", params.data);
-          that.$store.dispatch("setLoginState", true);
-        })
-        .catch(error => {
-          console.log(error);
-          that.redirectToLogin();
-        });
-    } else {
-        this.redirectToLogin()
-    }
+    this.checkLoginState()
   },
   methods: {
+    checkLoginState() {
+      if (this.isPageLoaded) if (!this.isLoggedIn) return this.redirectToLogin();
+        setTimeout(() => { this.checkLoginState()}, 100);
+    },
     redirectToLogin() {
-      this.$store.dispatch('addAlert', {message: 'Please, log in first', type: 'error', duration: 4000})
-      this.$router.push({name: 'home'});
-      this.$root.$emit('bv::show::modal', 'loginModal');
+      this.$store.dispatch("addAlert", {
+        message: "Please, log in first",
+        type: "1",
+        duration: 4000
+      });
+      this.$router.push({ name: "home" });
+      this.$root.$emit("bv::show::modal", "loginModal");
     }
   }
 };
 </script>
 <style>
-
 .single-line-group {
   display: flex;
 }
 
-.cell-1{
+.cell-1 {
   width: 8.1%;
 }
 .cell-2 {

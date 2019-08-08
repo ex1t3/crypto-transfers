@@ -1,6 +1,6 @@
 <template>
   <transition-group class="alert-block" name="alert" tag="div">
-    <div :class="item.type" class="alert-item" v-for="item in alerts" :key="item.id">
+    <div :class="alertTypes[item.type]" class="alert-item" v-for="item in alerts" :key="item.id">
       <p class="alert-message">{{ item.message }}</p>
       <button class="close-alert" @click="$store.dispatch('removeAlert', item.id)">&times;</button>
     </div>
@@ -11,6 +11,11 @@ import { mapGetters } from "vuex";
 import store from "../store";
 export default {
   store,
+  data() {
+    return {
+      alertTypes: ["success", "error", "info"]
+    };
+  },
   computed: mapGetters({
     alerts: "getAlerts"
   })
@@ -26,11 +31,11 @@ export default {
 .alert-item {
   min-height: 80px;
   width: 250px;
-  box-shadow: 0px 1px 14px 0px rgba(120, 120, 120, 0.24);
-  transition: .3s;
+  box-shadow: 0px 1px 14px 0px rgba(120, 120, 120, .24);
+  transition: 0.3s;
   border-radius: 3px;
   color: #2c3e50;
-  background: rgb(255, 2555, 255);
+  background: rgb(255, 2555, 255, .96);
   margin-bottom: 20px;
   position: relative;
 }
@@ -43,7 +48,7 @@ export default {
 }
 
 .alert-message {
-  padding: 20px;
+  padding: 25px;
   margin: 0;
   text-align: left;
 }
@@ -75,7 +80,7 @@ export default {
   cursor: pointer;
   position: absolute;
   right: 5px;
-  top: 10px;
+  top: 5px;
   font-size: 16px;
 }
 @keyframes appear {

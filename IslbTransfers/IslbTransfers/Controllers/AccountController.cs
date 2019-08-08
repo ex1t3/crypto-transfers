@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
 using IslbTransfers.CustomAttributes;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
@@ -19,11 +20,13 @@ namespace IslbTransfers.Controllers
     {
         private readonly IUserService _userService;
         private readonly IHostingEnvironment _hostingEnvironment;
+        private readonly IMapper _mapper;
 
-        public AccountController(IUserService userService, IHostingEnvironment hostingEnvironment)
+        public AccountController(IUserService userService, IHostingEnvironment hostingEnvironment, IMapper mapper)
         {
             _userService = userService;
             _hostingEnvironment = hostingEnvironment;
+            _mapper = mapper;
         }
 
         // CHECK USER AUTH TOKEN AND RETURN USER DATA
@@ -33,15 +36,7 @@ namespace IslbTransfers.Controllers
         public IActionResult GetUserData()
         {
             var user = _userService.GetByEmail(User.Identity.Name);
-            var userClientData = new UserClientData()
-            {
-                Email = user.Email,
-                FirstName = user.FirstName,
-                LastName = user.LastName,
-                IsExtraLogged = user.IsExtraLogged,
-                SocketToken = _userService.GenerateSocketToken(user.Id)
-            };
-            return Ok(userClientData);
+            return Ok(_userService.GetClientData(user));
         }
 
         // LOGIN METHOD
@@ -50,12 +45,12 @@ namespace IslbTransfers.Controllers
         public IActionResult Login([FromBody] UserLoginViewModel loginUser)
         {
             var checkedUser = _userService.CheckForUserIdentity(loginUser.Email, loginUser.Password);
-            if (checkedUser == null) return BadRequest("Incorrect User Data");
+            if (checkedUser == null) return BadRequest(new ResponseMessage { Message = "Incorrect User Data", Type = ResponseMessage.ResponseTypes.error, Duration = 3000 });
             if (checkedUser.IsExtraLogged)
                 return BadRequest(
-                    "Seems this user was registered via social media and can't be logged in. Use social buttons instead.");
+                    new ResponseMessage() { Message = "Seems this user was registered via social media and can't be logged in. Use social buttons instead.", Type = ResponseMessage.ResponseTypes.info, Duration = 10000 });
             var userClientData = _userService.Authenticate(checkedUser);
-            return Ok(userClientData);
+            return Ok(new {Message = new ResponseMessage { Message = "Login successful", Type = ResponseMessage.ResponseTypes.success, Duration = 3000 }, Data = userClientData});
         }
 
         // LOGOUT METHOD
@@ -90,24 +85,27 @@ namespace IslbTransfers.Controllers
                     await file.CopyToAsync(stream);
                 }
 
-                return Ok(new {fileName = HttpContext.Request.Scheme + "://" + HttpContext.Request.Host + "/uploads" + "/" + userUniqueFolder + "/" + uniqueFileName});
+                return Ok(new { fileName = HttpContext.Request.Scheme + "://" + HttpContext.Request.Host + "/uploads" + "/" + userUniqueFolder + "/" + uniqueFileName });
 
             }
             else
             {
-                return BadRequest(new {error = "Something went wrong with uploading your file"});
+                return BadRequest(new ResponseMessage { Message = "Something went wrong with uploading your file", Type = ResponseMessage.ResponseTypes.error, Duration = 5000 });
             }
         }
 
         [Route("identity")]
         [HttpPost]
         [ServiceFilter((typeof(SessionAuthorizeAttribute)))]
-        public IActionResult StoreUserIdentity(UserIdentityKyc userIdentity)
+        public IActionResult StoreUserIdentity(UserIdentityViewModel userIdentity)
         {
-           // store user kyc identity
-           userIdentity.RecordCreatedTime = DateTime.Now;
-           userIdentity.UserId = _userService.GetByEmail(User.Identity.Name).Id;
-           return Ok(userIdentity);
+            var mappedIdentity = _mapper.Map<UserIdentityKyc>(userIdentity);
+
+            // store user kyc identity
+            mappedIdentity.RecordCreatedTime = DateTime.Now;
+            mappedIdentity.UserId = _userService.GetByEmail(User.Identity.Name).Id;
+            _userService.AddIdentity(mappedIdentity);
+            return Ok(new { Message = new ResponseMessage { Message = "Your identity verification was successfully saved. Now give us some time to validate your data and accept the confirmation.", Type = ResponseMessage.ResponseTypes.success, Duration = 15000 }, Data = userIdentity });
         }
 
         // REGISTER METHOD
@@ -117,7 +115,7 @@ namespace IslbTransfers.Controllers
         {
             if (ModelState.IsValid)
             {
-                if (_userService.GetByEmail(loginUser.Email) != null) return BadRequest("Such Email address already exists");
+                if (_userService.GetByEmail(loginUser.Email) != null) return BadRequest(new ResponseMessage { Message = "Account with this email address already exists. Choose another one.", Type = ResponseMessage.ResponseTypes.error, Duration = 5000 });
                 var registeredUser = new User()
                 {
                     Email = loginUser.Email,
@@ -127,12 +125,12 @@ namespace IslbTransfers.Controllers
                     IsExtraLogged = false
                 };
                 var userClientData = _userService.Register(registeredUser);
-                return Ok(userClientData);
+                return Ok(new { Message = new ResponseMessage { Message = "You were successfully registered", Type = ResponseMessage.ResponseTypes.success, Duration = 3000 }, Data = userClientData });
             }
             var errors = ModelState.Select(x => x.Value.Errors)
                 .Where(y => y.Count > 0)
                 .ToList();
-            return BadRequest(errors);
+            return BadRequest(new ResponseMessage { Message = errors.Count + " fields weren't filled correct. Please, check input fields again.", Type = ResponseMessage.ResponseTypes.error, Duration = 6000, Errors = errors});
         }
 
         // LOGIN METHOD VIA FACEBOOK
@@ -149,31 +147,31 @@ namespace IslbTransfers.Controllers
             switch (oAuth.Provider)
             {
                 case "facebook":
-                {
-                    var userFbCredentials = await _userService.GetUserDataViaFacebook(oAuth.Token);
-                    if (userFbCredentials == null) return BadRequest("Something went wrong with your Facebook authentication...");
-                    loggedUser.Email = userFbCredentials.Email;
-                    loggedUser.FirstName = userFbCredentials.FirstName;
-                    loggedUser.LastName = userFbCredentials.LastName;
-                    providerId = userFbCredentials.Id;
-                    break;
-                }
+                    {
+                        var userFbCredentials = await _userService.GetUserDataViaFacebook(oAuth.Token);
+                        if (userFbCredentials == null) return BadRequest(new ResponseMessage { Message = "Something went wrong with your Facebook authentication...", Type = ResponseMessage.ResponseTypes.error, Duration = 3000 });
+                        loggedUser.Email = userFbCredentials.Email;
+                        loggedUser.FirstName = userFbCredentials.FirstName;
+                        loggedUser.LastName = userFbCredentials.LastName;
+                        providerId = userFbCredentials.Id;
+                        break;
+                    }
 
                 case "google":
-                {
-                    var userGoogleCredentials = await _userService.GetUserDataViaGoogle(oAuth.Token);
-                    if (userGoogleCredentials == null) return BadRequest("Something went wrong with your Google authentication...");
-                    loggedUser.Email = userGoogleCredentials.Email;
-                    loggedUser.FirstName = userGoogleCredentials.FirstName;
-                    loggedUser.LastName = userGoogleCredentials.LastName;
-                    providerId = userGoogleCredentials.Id;
-                    break;
-                }
+                    {
+                        var userGoogleCredentials = await _userService.GetUserDataViaGoogle(oAuth.Token);
+                        if (userGoogleCredentials == null) return BadRequest(new ResponseMessage { Message = "Something went wrong with your Google authentication...", Type = ResponseMessage.ResponseTypes.error, Duration = 3000 });
+                        loggedUser.Email = userGoogleCredentials.Email;
+                        loggedUser.FirstName = userGoogleCredentials.FirstName;
+                        loggedUser.LastName = userGoogleCredentials.LastName;
+                        providerId = userGoogleCredentials.Id;
+                        break;
+                    }
 
                 default:
-                {
-                    return BadRequest("Undefined OAuth network");
-                }
+                    {
+                        return BadRequest(new ResponseMessage { Message = "Undefined OAuth Network", Type = ResponseMessage.ResponseTypes.error, Duration = 3000 });
+                    }
             }
 
             UserClientData userClientData;
@@ -183,7 +181,7 @@ namespace IslbTransfers.Controllers
             // If it's first time user being registered with facebook
             if (userExternalLogin == null)
             {
-                if (_userService.GetByEmail(loggedUser.Email) != null) return BadRequest("Such Email address already exists");
+                if (_userService.GetByEmail(loggedUser.Email) != null) return BadRequest(new ResponseMessage { Message = "Account with such email address already exists", Type = ResponseMessage.ResponseTypes.error, Duration = 3000 });
                 userClientData = _userService.Register(loggedUser);
                 _userService.AddExternalLogin(new UserExternalLogin()
                 {
@@ -201,7 +199,7 @@ namespace IslbTransfers.Controllers
             }
 
             userClientData.IsExtraLogged = true;
-            return Ok(userClientData);
+            return Ok(new { Message = new ResponseMessage { Message = "Login successful", Type = ResponseMessage.ResponseTypes.success, Duration = 3000 }, Data = userClientData });
         }
     }
 }

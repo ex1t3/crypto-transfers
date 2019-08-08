@@ -13,6 +13,7 @@ namespace DAL
     {
         protected override void OnConfiguring(DbContextOptionsBuilder builder)
         {
+            /* FOR LOCAL */
             //builder.UseSqlServer("Server=(localdb)\\mssqllocaldb;Database=ISLB_DB;Trusted_Connection=True;");
 
             /* FOR REMOTE */
@@ -23,5 +24,6 @@ namespace DAL
         public DbSet<UserSession> UserSessions { get; set; }
         public DbSet<UserExternalLogin> UserExternalLogins { get; set; }
         public DbSet<UserIdentityKyc> UserIdentityKycs { get; set; }
+        public DbSet<UserWallet> UserWallets { get; set; }
     }
 }

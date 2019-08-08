@@ -12,3 +12,5 @@ E:\wamp64\www\islb-transfers\ISLBTransfers\DAL\obj\Release\netcoreapp2.2\DAL.Ass
 E:\wamp64\www\islb-transfers\ISLBTransfers\DAL\obj\Release\netcoreapp2.2\DAL.csproj.CopyComplete
 E:\wamp64\www\islb-transfers\ISLBTransfers\DAL\obj\Release\netcoreapp2.2\DAL.dll
 E:\wamp64\www\islb-transfers\ISLBTransfers\DAL\obj\Release\netcoreapp2.2\DAL.pdb
+E:\wamp64\www\islb-transfers\ISLBTransfers\DAL\bin\Release\netcoreapp2.2\Microsoft.AspNetCore.Mvc.Abstractions.dll
+E:\wamp64\www\islb-transfers\ISLBTransfers\DAL\bin\Release\netcoreapp2.2\Microsoft.AspNetCore.Mvc.Abstractions.xml

@@ -1,7 +1,7 @@
 {
   "runtimeTarget": {
     "name": ".NETCoreApp,Version=v2.2",
-    "signature": "b77af36bb2e7d5b5107d0cd1f1f30eee0b9f224d"
+    "signature": "bab72f6b1768626a7567c008500cda1cc33705b4"
   },
   "compilationOptions": {
     "defines": [
@@ -24,6 +24,7 @@
     ".NETCoreApp,Version=v2.2": {
       "IslbTransfers/1.0.0": {
         "dependencies": {
+          "AutoMapper": "8.1.1",
           "DAL": "1.0.0",
           "Microsoft.AspNetCore.App": "2.2.5",
           "Microsoft.AspNetCore.Razor.Design": "2.2.0",
@@ -39,6 +40,21 @@
         },
         "compile": {
           "IslbTransfers.dll": {}
+        }
+      },
+      "AutoMapper/8.1.1": {
+        "dependencies": {
+          "Microsoft.CSharp": "4.5.0",
+          "System.Reflection.Emit": "4.3.0"
+        },
+        "runtime": {
+          "lib/netstandard2.0/AutoMapper.dll": {
+            "assemblyVersion": "8.1.1.0",
+            "fileVersion": "8.1.1.0"
+          }
+        },
+        "compile": {
+          "lib/netstandard2.0/AutoMapper.dll": {}
         }
       },
       "Microsoft.CodeAnalysis.CSharp.Workspaces/2.8.0": {
@@ -387,6 +403,7 @@
       },
       "Service/1.0.0": {
         "dependencies": {
+          "AutoMapper": "8.1.1",
           "DAL": "1.0.0",
           "Model": "1.0.0",
           "System.IdentityModel.Tokens.Jwt": "5.3.0"
@@ -3593,6 +3610,13 @@
       "type": "project",
       "serviceable": false,
       "sha512": ""
+    },
+    "AutoMapper/8.1.1": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-GKBliBukkLG0z/U0T4Jy+yEpr5bKDImQ9nEy/T8jqNulwNkWDjiEWa9TL4yCxIhleDbmVmw2xYSaJ3Eb2OcSUg==",
+      "path": "automapper/8.1.1",
+      "hashPath": "automapper.8.1.1.nupkg.sha512"
     },
     "Microsoft.CodeAnalysis.CSharp.Workspaces/2.8.0": {
       "type": "package",

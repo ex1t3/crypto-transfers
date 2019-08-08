@@ -6,7 +6,7 @@
     variant="info"
   >
     <b-container>
-      <b-navbar-brand href="/">ISLB</b-navbar-brand>
+      <b-navbar-brand href="#" @click="$router.push({name: 'home'})">ISLB</b-navbar-brand>
       <b-navbar-toggle target="nav_collapse"></b-navbar-toggle>
 
       <b-collapse is-nav id="nav_collapse">
@@ -25,9 +25,10 @@
             <b-dropdown-item href="#">FA</b-dropdown-item>
           </b-nav-item-dropdown>
           <b-nav-item
-            :class="{'current-route': $router.currentRoute.name === 'dashboard'}"
+            :class="{'current-route': currentRoute === 'dashboard'}"
             v-if="isLoggedIn"
-            href="/#/dashboard"
+            @click="$router.push({name: 'dashboard'})"
+            href="#"
           >Dashboard</b-nav-item>
           <b-nav-item
             v-if="!isLoggedIn"
@@ -57,13 +58,21 @@ export default {
     user: "getUser",
     socket: "getSocketData"
   }),
+  data () {
+    return {
+      currentRoute: this.$route.name,
+    }
+  },
   watch: {
     "socket.isConnected": function(flag) {
       if (flag) this.$store.dispatch("authenticate");
-      else this.$store.dispatch("addAlert", {message: "Socket session closed", duration: 3000, type: 'info'})
+      else this.$store.dispatch("addAlert", {message: "Socket session closed", duration: 3000, type: 2})
     },
     "socket.sessionToken": function(token) {
       if (token !== null) this.$store.dispatch("send", "get_rates");
+    },
+    $route: function (to, from) {
+      this.currentRoute = to.name
     }
   },
   beforeMount() {
@@ -78,11 +87,13 @@ export default {
         }
       })
         .then(params => {
+          that.$store.dispatch("loadPage");
           that.$store.dispatch("setUser", params.data);
           that.$store.dispatch("setLoginState", true);
         })
         .catch(error => {
           console.log(error);
+          that.$store.dispatch("loadPage");
         });
     }
   },

@@ -31,6 +31,7 @@ export default {
 <style scoped>
 .sidebar-block {
   display: flex;
+  padding-top: 100px;
 }
 @media (max-width: 560px) {
   .sidebar-block {

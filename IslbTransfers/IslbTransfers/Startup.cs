@@ -4,9 +4,11 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using AutoMapper;
 using DAL;
 using DAL.DbRepository;
 using IslbTransfers.CustomAttributes;
+using IslbTransfers.Mappings;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -37,6 +39,12 @@ namespace IslbTransfers
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            var mapConfig = new MapperConfiguration(mc =>
+            {
+                mc.AddProfile<MappingProfile>();
+            });
+            IMapper mapper = new Mapper(mapConfig);
+            services.AddSingleton(mapper);
 
             services.AddCors();
 
@@ -65,12 +73,16 @@ namespace IslbTransfers
                     };
                 });
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
-            services.AddScoped<IUserService, UserService>();
+            services.AddScoped<IDbFactory, DbFactory>();
             services.AddScoped<SessionAuthorizeAttribute>();
+            services.AddScoped<IUserService, UserService>();
             services.AddScoped<IDbRepository<User>, DbRepository<User>>();
             services.AddScoped<IDbRepository<UserSession>, DbRepository<UserSession>>();
+            services.AddScoped<IDbRepository<UserIdentityKyc>, DbRepository<UserIdentityKyc>>();
             services.AddScoped<IDbRepository<UserExternalLogin>, DbRepository<UserExternalLogin>>();
-            services.AddScoped<IDbFactory, DbFactory>();
+            services.AddScoped<IDbRepository<UserWallet>, DbRepository<UserWallet>>();
+
+            services.AddScoped<ITransactionService, TransactionService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

@@ -6,7 +6,10 @@ import {
   SOCKET_ONERROR,
   SOCKET_ONMESSAGE,
   SOCKET_RECONNECT,
-  SOCKET_RECONNECT_ERROR
+  SOCKET_RECONNECT_ERROR,
+  OPEN_EXCHANGE_CONFIRM,
+  OPEN_TRANSFER_CONFIRM,
+  PAGE_LOADED
 } from "./mutation-types";
 
 Vue.use(Vuex);
@@ -15,10 +18,13 @@ const vm = new Vue();
 
 export default new Vuex.Store({
   state: {
+    isPageLoaded: false,
     user: Array,
     alerts: [],
     alertId: 0,
     isLoggedIn: false,
+    isExchangeConfirmOpened: false,
+    isTransferConfirmOpened: false,
     currentPage: String,
     socket: {
       isConnected: false,
@@ -38,12 +44,9 @@ export default new Vuex.Store({
     exchange: {
       givenCurrency: "ETH",
       receivedCurrency: "BTC",
-      givenAmount: {
-        type: Number
-      },
-      receivedAmount: {
-        type: Number
-      }
+      givenAmount: "",
+      receivedAmount: "",
+      payment: Array
     },
     loadingButtonState: false
   },
@@ -54,7 +57,10 @@ export default new Vuex.Store({
     getCurrentPage: state => state.currentPage,
     getTransferData: state => state.transfer,
     getExchangeData: state => state.exchange,
-    getSocketData: state => state.socket
+    getSocketData: state => state.socket,
+    getExchangeConfirmationState: state => state.isExchangeConfirmOpened,
+    getTransferConfirmationState: state => state.isTransferConfirmOpened,
+    isPageLoaded: state => state.isPageLoaded,
   },
   actions: {
     authenticate: context => {
@@ -95,10 +101,22 @@ export default new Vuex.Store({
     },
     setExchangeData({ commit }, data) {
       commit("setExchangeData", data);
+    },
+    setExchangeConfirm({ commit }) {
+      commit(OPEN_EXCHANGE_CONFIRM);
+    },
+    openTransferConfirm({ commit }) {
+      commit(OPEN_TRANSFER_CONFIRM);
+    },
+    loadPage({ commit }) {
+      commit(PAGE_LOADED);
     }
   },
   mutations: {
     setUser(state, user) {
+      if (user.identity.year === user.identity.month)
+        user.identity.year = user.identity.month = user.identity.day = user.identity.dialCode = user.identity.country =
+          "";
       state.user = user;
     },
     addAlert(state, alert) {
@@ -132,8 +150,25 @@ export default new Vuex.Store({
       state.transfer = data;
     },
     setExchangeData(state, data) {
-      data.receivedAmount = data.givenAmou;
+      if (isNaN(data.givenAmount)) {
+        data.givenAmount = "";
+        data.receivedAmount = "";
+        return;
+      }
+      data.receivedAmount =
+        data.givenAmount /
+        (state.socket.rates[data.receivedCurrency] /
+          state.socket.rates[data.givenCurrency]);
       state.exchange = data;
+    },
+    [OPEN_EXCHANGE_CONFIRM](state) {
+      state.isExchangeConfirmOpened = !state.isExchangeConfirmOpened;
+    },
+    [OPEN_TRANSFER_CONFIRM](state) {
+      state.isTransferConfirmOpened = !state.isTransferConfirmOpened;
+    },
+    [PAGE_LOADED](state) {
+      state.isPageLoaded = true;
     },
     [SOCKET_ONOPEN](state, event) {
       state.socket.isConnected = true;
@@ -150,10 +185,14 @@ export default new Vuex.Store({
     [SOCKET_ONMESSAGE](state, data) {
       console.log(data);
       switch (data.ResponseType) {
-        case "initialize_session":
+        case "initialize_session": {
           state.socket.sessionToken = data.Token;
-        case "get_rates":
+          break;
+        }
+        case "get_rates": {
           state.socket.rates = data.Rates;
+          break;
+        }
       }
     },
     // mutations for reconnect methods
