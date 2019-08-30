@@ -1,5 +1,5 @@
 <template>
-  <b-form class="col-sm-4 offset-md-4">
+  <b-form class="col-sm-6 col-md-4 offset-md-4">
     <div class="form-group left">
       <label>BTC Address (Bitcoin)</label>
       <input class="form-control" v-model="user.wallets.BTC" />

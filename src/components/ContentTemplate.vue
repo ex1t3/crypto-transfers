@@ -4,6 +4,7 @@
     <div class="content-page">
       <PersonalInfo v-if="currentPage == 'personalInfo'" />
       <Verification v-if="currentPage == 'identityVerifiation'" />
+      <Account v-if="currentPage == 'account'" />
       <WithdrawAddresses v-if="currentPage == 'withdrawAddresses'" />
 
       <!-- DASHBOARD -->
@@ -15,6 +16,7 @@
 <script>
 import PersonalInfo from "../components/ProfilePages/PersonalInfo";
 import Verification from "../components/ProfilePages/IdentityVerification";
+import Account from "../components/ProfilePages/Account";
 import WithdrawAddresses from "../components/ProfilePages/WithdrawAddresses";
 
 import Overview from "../components/DashboardPages/Overview";
@@ -25,6 +27,7 @@ export default {
   components: {
     PersonalInfo,
     Verification,
+    Account,
     WithdrawAddresses,
     Overview,
     Transactions

@@ -75,7 +75,7 @@ namespace IslbTransfers
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
             services.AddScoped<IDbFactory, DbFactory>();
             services.AddScoped<SessionAuthorizeAttribute>();
-            services.AddScoped<IUserService, UserService>();
+            services.AddScoped<IAccountService, AccountService>();
             services.AddScoped<IDbRepository<User>, DbRepository<User>>();
             services.AddScoped<IDbRepository<UserSession>, DbRepository<UserSession>>();
             services.AddScoped<IDbRepository<UserIdentityKyc>, DbRepository<UserIdentityKyc>>();
@@ -83,6 +83,7 @@ namespace IslbTransfers
             services.AddScoped<IDbRepository<UserWallet>, DbRepository<UserWallet>>();
 
             services.AddScoped<ITransactionService, TransactionService>();
+            services.AddScoped<IEmailService, EmailService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

@@ -17,7 +17,7 @@ using Newtonsoft.Json;
 
 namespace Service.Services
 {
-    public interface IUserService
+    public interface IAccountService
     {
         UserClientData Authenticate(User user);
         UserClientData Register(User user);
@@ -37,7 +37,7 @@ namespace Service.Services
         UserIdentityKyc GetIdentity(int userId);
         UserWallet GetWallets(int userId);
     }
-    public class UserService : IUserService
+    public class AccountService : IAccountService
     {
         private readonly IDbRepository<User> _userRepository;
         private readonly IDbRepository<UserSession> _sessionRepository;
@@ -50,7 +50,7 @@ namespace Service.Services
         private readonly int _defaultUserSessionTimeOut = 7;
         private readonly string _secureCode = "some_secure_code_#refJHJFHcnn212"; //TODO: More protected code need to be implemented in secure reasons
 
-        public UserService(IDbRepository<User> userRepository, IOptions<OAuthSettings> oauthOptions, IDbRepository<UserSession> sessionRepository, IDbRepository<UserExternalLogin> externalLoginRepository, IDbRepository<UserIdentityKyc> userIdentityRepository, IMapper mapper, IDbRepository<UserWallet> userWalletRepository)
+        public AccountService(IDbRepository<User> userRepository, IOptions<OAuthSettings> oauthOptions, IDbRepository<UserSession> sessionRepository, IDbRepository<UserExternalLogin> externalLoginRepository, IDbRepository<UserIdentityKyc> userIdentityRepository, IMapper mapper, IDbRepository<UserWallet> userWalletRepository)
         {
             this._userRepository = userRepository;
             _sessionRepository = sessionRepository;
@@ -115,6 +115,8 @@ namespace Service.Services
                 AccessToken = token,
                 SocketToken = GenerateSocketToken(user.Id),
                 Identity = mappedIdentity,
+                IsExtraLogged = user.IsExtraLogged,
+                IsEmailVerified = user.IsEmailVerified,
                 Wallets = GetWallets(user.Id) ?? new UserWallet()
             };
         }

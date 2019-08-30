@@ -147,7 +147,7 @@
         </div>
       </div>
 
-      <div class="form-group col-sm-6 offset-md-3 centered">
+      <div class="form-group col-sm-6 col-md-4 offset-md-4 centered">
         <b-btn type="submit" class="btn-primary btn-block">Confirm Identity</b-btn>
       </div>
     </b-form>

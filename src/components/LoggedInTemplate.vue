@@ -17,6 +17,7 @@ export default {
         setTimeout(() => { this.checkLoginState()}, 100);
     },
     redirectToLogin() {
+      if (this.$router.currentRoute.name === 'home') return;
       this.$store.dispatch("addAlert", {
         message: "Please, log in first",
         type: "1",

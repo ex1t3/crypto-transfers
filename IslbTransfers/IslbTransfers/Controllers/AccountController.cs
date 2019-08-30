@@ -18,13 +18,13 @@ namespace IslbTransfers.Controllers
     [ApiController]
     public class AccountController : ControllerBase
     {
-        private readonly IUserService _userService;
+        private readonly IAccountService _accountService;
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly IMapper _mapper;
 
-        public AccountController(IUserService userService, IHostingEnvironment hostingEnvironment, IMapper mapper)
+        public AccountController(IAccountService accountService, IHostingEnvironment hostingEnvironment, IMapper mapper)
         {
-            _userService = userService;
+            _accountService = accountService;
             _hostingEnvironment = hostingEnvironment;
             _mapper = mapper;
         }
@@ -35,8 +35,8 @@ namespace IslbTransfers.Controllers
         [ServiceFilter(typeof(SessionAuthorizeAttribute))]
         public IActionResult GetUserData()
         {
-            var user = _userService.GetByEmail(User.Identity.Name);
-            return Ok(_userService.GetClientData(user));
+            var user = _accountService.GetByEmail(User.Identity.Name);
+            return Ok(_accountService.GetClientData(user));
         }
 
         // LOGIN METHOD
@@ -44,12 +44,12 @@ namespace IslbTransfers.Controllers
         [HttpPost]
         public IActionResult Login([FromBody] UserLoginViewModel loginUser)
         {
-            var checkedUser = _userService.CheckForUserIdentity(loginUser.Email, loginUser.Password);
+            var checkedUser = _accountService.CheckForUserIdentity(loginUser.Email, loginUser.Password);
             if (checkedUser == null) return BadRequest(new ResponseMessage { Message = "Incorrect User Data", Type = ResponseMessage.ResponseTypes.error, Duration = 3000 });
             if (checkedUser.IsExtraLogged)
                 return BadRequest(
                     new ResponseMessage() { Message = "Seems this user was registered via social media and can't be logged in. Use social buttons instead.", Type = ResponseMessage.ResponseTypes.info, Duration = 10000 });
-            var userClientData = _userService.Authenticate(checkedUser);
+            var userClientData = _accountService.Authenticate(checkedUser);
             return Ok(new {Message = new ResponseMessage { Message = "Login successful", Type = ResponseMessage.ResponseTypes.success, Duration = 3000 }, Data = userClientData});
         }
 
@@ -59,11 +59,11 @@ namespace IslbTransfers.Controllers
         [ServiceFilter((typeof(SessionAuthorizeAttribute)))]
         public IActionResult LogOut()
         {
-            var user = _userService.GetByEmail(User.Identity.Name);
+            var user = _accountService.GetByEmail(User.Identity.Name);
             var token = HttpContext.Request.Headers["Authorization"].ToString()?.Substring(7);
             if (user != null && token != null)
             {
-                _userService.InValidateUserSession(user.Id, token);
+                _accountService.InValidateUserSession(user.Id, token);
             }
             return Ok();
         }
@@ -77,7 +77,7 @@ namespace IslbTransfers.Controllers
             if (file != null)
             {
                 var uploadsPath = "UserUploads";
-                var userUniqueFolder = _userService.GetByEmail(User.Identity.Name).Id;
+                var userUniqueFolder = _accountService.GetByEmail(User.Identity.Name).Id;
                 var directory = System.IO.Directory.CreateDirectory(this._hostingEnvironment.ContentRootPath + "\\" + uploadsPath + "\\" + userUniqueFolder);
                 string uniqueFileName = DateTime.Now.ToBinary() + Path.GetExtension(file.FileName);
                 using (FileStream stream = System.IO.File.Create(directory.FullName + "\\" + uniqueFileName))
@@ -103,8 +103,8 @@ namespace IslbTransfers.Controllers
 
             // store user kyc identity
             mappedIdentity.RecordCreatedTime = DateTime.Now;
-            mappedIdentity.UserId = _userService.GetByEmail(User.Identity.Name).Id;
-            _userService.AddIdentity(mappedIdentity);
+            mappedIdentity.UserId = _accountService.GetByEmail(User.Identity.Name).Id;
+            _accountService.AddIdentity(mappedIdentity);
             return Ok(new { Message = new ResponseMessage { Message = "Your identity verification was successfully saved. Now give us some time to validate your data and accept the confirmation.", Type = ResponseMessage.ResponseTypes.success, Duration = 15000 }, Data = userIdentity });
         }
 
@@ -115,16 +115,16 @@ namespace IslbTransfers.Controllers
         {
             if (ModelState.IsValid)
             {
-                if (_userService.GetByEmail(loginUser.Email) != null) return BadRequest(new ResponseMessage { Message = "Account with this email address already exists. Choose another one.", Type = ResponseMessage.ResponseTypes.error, Duration = 5000 });
+                if (_accountService.GetByEmail(loginUser.Email) != null) return BadRequest(new ResponseMessage { Message = "Account with this email address already exists. Choose another one.", Type = ResponseMessage.ResponseTypes.error, Duration = 5000 });
                 var registeredUser = new User()
                 {
                     Email = loginUser.Email,
-                    Password = _userService.HashPassword(loginUser.Password),
+                    Password = _accountService.HashPassword(loginUser.Password),
                     FirstName = null,
                     LastName = null,
                     IsExtraLogged = false
                 };
-                var userClientData = _userService.Register(registeredUser);
+                var userClientData = _accountService.Register(registeredUser);
                 return Ok(new { Message = new ResponseMessage { Message = "You were successfully registered", Type = ResponseMessage.ResponseTypes.success, Duration = 3000 }, Data = userClientData });
             }
             var errors = ModelState.Select(x => x.Value.Errors)
@@ -148,7 +148,7 @@ namespace IslbTransfers.Controllers
             {
                 case "facebook":
                     {
-                        var userFbCredentials = await _userService.GetUserDataViaFacebook(oAuth.Token);
+                        var userFbCredentials = await _accountService.GetUserDataViaFacebook(oAuth.Token);
                         if (userFbCredentials == null) return BadRequest(new ResponseMessage { Message = "Something went wrong with your Facebook authentication...", Type = ResponseMessage.ResponseTypes.error, Duration = 3000 });
                         loggedUser.Email = userFbCredentials.Email;
                         loggedUser.FirstName = userFbCredentials.FirstName;
@@ -159,7 +159,7 @@ namespace IslbTransfers.Controllers
 
                 case "google":
                     {
-                        var userGoogleCredentials = await _userService.GetUserDataViaGoogle(oAuth.Token);
+                        var userGoogleCredentials = await _accountService.GetUserDataViaGoogle(oAuth.Token);
                         if (userGoogleCredentials == null) return BadRequest(new ResponseMessage { Message = "Something went wrong with your Google authentication...", Type = ResponseMessage.ResponseTypes.error, Duration = 3000 });
                         loggedUser.Email = userGoogleCredentials.Email;
                         loggedUser.FirstName = userGoogleCredentials.FirstName;
@@ -176,14 +176,14 @@ namespace IslbTransfers.Controllers
 
             UserClientData userClientData;
 
-            var userExternalLogin = _userService.GetExternalLogin(providerId, oAuth.Provider);
+            var userExternalLogin = _accountService.GetExternalLogin(providerId, oAuth.Provider);
 
             // If it's first time user being registered with facebook
             if (userExternalLogin == null)
             {
-                if (_userService.GetByEmail(loggedUser.Email) != null) return BadRequest(new ResponseMessage { Message = "Account with such email address already exists", Type = ResponseMessage.ResponseTypes.error, Duration = 3000 });
-                userClientData = _userService.Register(loggedUser);
-                _userService.AddExternalLogin(new UserExternalLogin()
+                if (_accountService.GetByEmail(loggedUser.Email) != null) return BadRequest(new ResponseMessage { Message = "Account with such email address already exists", Type = ResponseMessage.ResponseTypes.error, Duration = 3000 });
+                userClientData = _accountService.Register(loggedUser);
+                _accountService.AddExternalLogin(new UserExternalLogin()
                 {
                     UserId = loggedUser.Id,
                     ProviderId = providerId,
@@ -195,7 +195,7 @@ namespace IslbTransfers.Controllers
             else
             {
                 loggedUser.Id = userExternalLogin.UserId;
-                userClientData = _userService.Authenticate(loggedUser);
+                userClientData = _accountService.Authenticate(loggedUser);
             }
 
             userClientData.IsExtraLogged = true;

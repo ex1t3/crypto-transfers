@@ -14,6 +14,7 @@ namespace Model.Models
         public string Password { get; set; }
         public string Email { get; set; }
         public bool IsEmailVerified { get; set; }
+        public string EmailVerificationCode { get; set; }
         public string ProfilePicture { get; set; }
         public DateTime CreatedDateTime { get; set; }
         public bool IsExtraLogged { get; set; }
@@ -41,6 +42,7 @@ namespace Model.Models
         public string SocketToken { get; set; }
         public string Email { get; set; }
         public bool IsExtraLogged { get; set; }
+        public bool IsEmailVerified { get; set; }
         public UserIdentityViewModel Identity { get; set; }
         public UserWallet Wallets { get; set; }
     }

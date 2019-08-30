@@ -18,17 +18,17 @@ namespace IslbTransfers.CustomAttributes
 {
     public class SessionAuthorizeAttribute : ActionFilterAttribute
     {
-        private readonly IUserService _userService;
+        private readonly IAccountService _accountService;
 
-        public SessionAuthorizeAttribute(IUserService userService)
+        public SessionAuthorizeAttribute(IAccountService accountService)
         {
-            _userService = userService;
+            _accountService = accountService;
         }
 
         public override void OnActionExecuting(ActionExecutingContext context)
         {
             var token = context.HttpContext.Request.Headers["Authorization"].ToString()?.Substring(7);
-            if (_userService.ReValidateUserSession(token, context.HttpContext.User.Identity.Name)) return;
+            if (_accountService.ReValidateUserSession(token, context.HttpContext.User.Identity.Name)) return;
             context.Result = new BadRequestObjectResult("Your session isn't valid or has been expired.");
         }
     }

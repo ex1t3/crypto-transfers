@@ -99,6 +99,7 @@ export default {
   },
   methods: {
     logOut() {
+      this.$router.push({ name: "home" });
       this.$store.dispatch("setLoginState", false);
       axios({
         method: "POST",
@@ -113,7 +114,6 @@ export default {
         .catch(function(params) {
           console.log(params);
         });
-      this.$router.push({ name: "home" });
     }
   }
 };
