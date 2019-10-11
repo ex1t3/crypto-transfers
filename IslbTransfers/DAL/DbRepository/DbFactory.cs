@@ -12,27 +12,26 @@ namespace DAL.DbRepository
 
     public class DbFactory : IDbFactory
     {
-        private IslbDbContext _dbContext;
-
-        public IslbDbContext Get()
-        {
-            return _dbContext ?? (_dbContext = new IslbDbContext());
-        }
-
         private bool _isDisposed;
-
+        private IslbDbContext _context;
         ~DbFactory()
         {
             Dispose(false);
         }
 
+        public IslbDbContext Get()
+        {
+            _context = new IslbDbContext();
+            _context.ChangeTracker.AutoDetectChangesEnabled = false;
+            return _context;
+        }
         public void Dispose()
         {
             Dispose(true);
             GC.SuppressFinalize(this);
         }
 
-        private void Dispose(bool disposing)
+        protected void Dispose(bool disposing)
         {
             if (!_isDisposed && disposing)
             {
@@ -44,7 +43,7 @@ namespace DAL.DbRepository
 
         protected void DisposeCore()
         {
-            _dbContext?.Dispose();
+            _context?.Dispose();
         }
     }
 }

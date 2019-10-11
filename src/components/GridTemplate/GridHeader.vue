@@ -1,7 +1,7 @@
 <template>
     <div class="simple-grid-header">
         <div :key="index" v-for="(item, index) in headers" class="simple-grid-header-item">
-            {{ item }}
+            {{ item.Label }}
         </div>
     </div>
 </template>
@@ -15,7 +15,9 @@ export default {
     background: #ddd;
     display: flex;
     width: 100%;
-    padding: 2px;
+    padding: 10px 0px;
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
 }
 .simple-grid-header-item {
     padding: 5px;

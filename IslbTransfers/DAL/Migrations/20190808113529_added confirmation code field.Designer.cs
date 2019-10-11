@@ -143,7 +143,7 @@ namespace DAL.Migrations
 
                     b.HasIndex("UserId1");
 
-                    b.ToTable("UserWallets");
+                    b.ToTable("UserWallet");
                 });
 
             modelBuilder.Entity("Model.Models.UserExternalLogin", b =>

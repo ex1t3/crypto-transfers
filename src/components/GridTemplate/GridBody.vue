@@ -1,19 +1,28 @@
 <template>
   <div class="simple-grid-body">
-    <div :key="index" v-for="(item, index) in data" class="simple-grid-body-row">
+    <div
+      :key="index"
+      v-for="(item, index) in data"
+      class="simple-grid-body-row"
+      :style="getStyle(item)"
+    >
       <div
         :key="index_name"
-        v-for="(name, index_name) in headers"
+        v-for="(header, index_name) in headers"
         class="simple-grid-body-cell"
-      >{{ item[name] }}</div>
+      >{{ item[header.Name] }}</div>
     </div>
   </div>
 </template>
 <script>
 export default {
-  props: ["data", "headers"],
-  mounted() {
-    console.log(this.data);
+  props: ["data", "headers", "styles"],
+  methods: {
+    getStyle(item) {
+      return this.styles === undefined
+        ? null
+        : this.styles.values[item[this.styles.key]];
+    }
   }
 };
 </script>
@@ -21,23 +30,22 @@ export default {
 .simple-grid-body-cell {
   width: 20%;
   font-size: 12px;
-  word-break: break-all;
-  min-height: 30px;
-  border-right: 2px solid #fafafa;
-  display: flex;
-  align-items: center;
-  padding: 0 5px;
+  word-break: break-word;
+  min-height: 45px;
+  padding: 10px 0 5px 0;
   text-align: center;
 }
 .simple-grid-body-cell:last-of-type {
-    border-right: none;
+  border-right: none;
 }
 .simple-grid-body-row {
   width: 100%;
   display: flex;
   position: relative;
-  background: #e6e6e6;
-  margin-top: 2.5px;
+  background: #f0f0f0;
+}
+.simple-grid-body-row:nth-child(2n) {
+  background: #f6f6f6;
 }
 </style>
 

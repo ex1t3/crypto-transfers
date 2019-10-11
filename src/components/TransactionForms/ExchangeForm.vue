@@ -1,60 +1,75 @@
 <template>
-    <b-form
-      v-on:submit="createExchange($event)"
-      v-on:input="updateForm('setExchangeData', exchange)"
-      v-on:change="updateForm('setExchangeData', exchange)"
-      class="form-horizontal"
-    >
-    <ExchangeConfirm v-if="isConfirmationVisible" :payment="payment"/>
-      <div class="row">
-        <div class="col-sm-12">
-          <div class="form-group" v-if="typeof socket.rates === 'object'">
-            <div class="col-sm-12 col-md-12">
-              <p class="rates">
-                1
-                <span class="selected-currency">{{ exchange.receivedCurrency }}</span>
-                = {{ (socket.rates[exchange.receivedCurrency] / socket.rates[exchange.givenCurrency]) }}
-                <span class="selected-currency">{{ exchange.givenCurrency }}</span>
-              </p>
-            </div>
+  <b-form
+    v-on:submit="createExchange($event)"
+    v-on:input="updateForm('setExchangeData', exchange)"
+    v-on:change="updateForm('setExchangeData', exchange)"
+    class="form-horizontal"
+  >
+    <ExchangeConfirm v-if="isConfirmationVisible" :payment="payment" />
+    <div class="row">
+      <div class="col-sm-12">
+        <div class="form-group">
+          <label
+            class="col-sm-12 col-md-6 control-label"
+            :class="{'label-for-disabled': !socket.sessionToken}"
+          >Exchange Type</label>
+          <div class="col-sm-12 col-md-6">
+            <select
+              name="givenCurrency"
+              required
+              v-model="exchange.givenCurrency"
+              :disabled="!socket.sessionToken"
+              class="form-control col-sm-5"
+            >
+              <option
+                v-for="(item, index) in currencies"
+                :value="item.Value"
+                :key="index"
+              >{{ item.Label }}</option>
+            </select>
+            <span class="col-sm-2 exchange-to-icon">>></span>
+            <select
+              name="receivedCurrency"
+              v-model="exchange.receivedCurrency"
+              :disabled="!socket.sessionToken"
+              class="form-control col-sm-5"
+            >
+              <option
+                v-for="(item, index) in (Array.from(currencies)).splice(0,2)"
+                :value="item.Value"
+                :key="index"
+              >{{ item.Label }}</option>
+            </select>
           </div>
-          <div class="form-group">
-            <label
-              class="col-sm-12 col-md-6 control-label"
-              :class="{'label-for-disabled': !socket.sessionToken}"
-            >Given Currency</label>
-            <div class="col-sm-12 col-md-6">
-              <select
-                name="givenCurrency"
-                required
-                v-model="exchange.givenCurrency"
-                :disabled="!socket.sessionToken"
-                class="form-control"
-              >
-                <option
-                  v-for="(item, index) in currencies"
-                  :value="item.Value"
-                  :key="index"
-                >{{ item.Label }}</option>
-              </select>
-            </div>
+        </div>
+        <div class="form-group" v-if="typeof socket.rates === 'object' && socket.sessionToken">
+          <div class="col-sm-12 col-md-6 offset-md-6">
+            <p class="rates">
+              1
+              <span class="selected-currency">{{ exchange.receivedCurrency }}</span>
+              = {{ (socket.rates[exchange.receivedCurrency] / socket.rates[exchange.givenCurrency]) }}
+              <span
+                class="selected-currency"
+              >{{ exchange.givenCurrency }}</span>
+            </p>
           </div>
-          <div class="form-group">
-            <label
-              class="col-sm-12 col-md-6 control-label"
-              :class="{'label-for-disabled': !socket.sessionToken}"
-            >Given Amount</label>
-            <div class="col-sm-12 col-md-6">
-              <input
-                v-model="exchange.givenAmount"
-                required
-                :disabled="!socket.sessionToken"
-                :placeholder="'Amount you pay to receive ' + exchange.receivedCurrency"
-                class="form-control"
-              />
-            </div>
+        </div>
+        <div class="form-group">
+          <label
+            class="col-sm-12 col-md-6 control-label"
+            :class="{'label-for-disabled': !socket.sessionToken}"
+          >Given Amount</label>
+          <div class="col-sm-12 col-md-6">
+            <input
+              v-model="exchange.givenAmount"
+              required
+              :disabled="!socket.sessionToken"
+              :placeholder="'Amount you pay to receive ' + exchange.receivedCurrency"
+              class="form-control"
+            />
           </div>
-          <div class="form-group">
+        </div>
+        <!-- <div class="form-group">
             <label
               class="col-sm-12 col-md-6 control-label"
               :class="{'label-for-disabled': !socket.sessionToken}"
@@ -73,24 +88,40 @@
                 >{{ item.Label }}</option>
               </select>
             </div>
+        </div>-->
+        <div class="form-group">
+          <label
+            class="col-sm-12 col-md-6 control-label"
+            :class="{'label-for-disabled': !socket.sessionToken}"
+          >Received Amount</label>
+          <div class="col-sm-12 col-md-6">
+            <input
+              :disabled="!socket.sessionToken"
+              v-model="exchange.receivedAmount"
+              readonly
+              :placeholder="'Amount you can buy for ' + exchange.givenCurrency"
+              name="receivedAmount"
+              class="form-control"
+            />
           </div>
-          <div class="form-group">
-            <label
-              class="col-sm-12 col-md-6 control-label"
-              :class="{'label-for-disabled': !socket.sessionToken}"
-            >Received Amount</label>
-            <div class="col-sm-12 col-md-6">
-              <input
-                :disabled="!socket.sessionToken"
-                v-model="exchange.receivedAmount"
-                readonly
-                :placeholder="'Amount you can buy for ' + exchange.givenCurrency"
-                name="receivedAmount"
-                class="form-control"
-              />
-            </div>
+        </div>
+        <div class="form-group">
+          <label
+            class="col-sm-12 col-md-6 control-label"
+            :class="{'label-for-disabled': !socket.sessionToken}"
+          >Receiving {{ exchange.receivedCurrency }} Address</label>
+          <div class="col-sm-12 col-md-6">
+            <input
+              :disabled="!socket.sessionToken"
+              v-model="exchange.addressTo"
+              :placeholder="'Where you want us to send ' + exchange.receivedCurrency"
+              name="addressTo"
+              required
+              class="form-control"
+            />
           </div>
-          <!-- <div class="form-group">
+        </div>
+        <!-- <div class="form-group">
                 <label
                   for="description"
                   class="col-sm-12 col-md-6 control-label"
@@ -127,28 +158,28 @@
                     <span>Ethereum</span>
                   </div>
                 </div>
-          </div>-->
-          <div class="form-group">
-            <div class="offset-md-6 col-sm-6 col-md-6">
-              <input required type="checkbox" id="termsAgreement" />
-              <label for="termsAgreement">Terms of Service</label>
-            </div>
+        </div>-->
+        <div class="form-group">
+          <div class="offset-md-6 col-sm-6 col-md-6">
+            <input required type="checkbox" id="termsAgreement" />
+            <label for="termsAgreement">Terms of Service</label>
           </div>
-          <div class="offset-md-6 col-md-6 col-sm-6">
-            <div class="form-group">
-              <b-btn
-                class="btn-block btn-lg btn-primary"
-                :disabled="!socket.sessionToken"
-                type="submit"
-              >
-                EXCHANGE
-                <span class="loader" :class="{loading: isLoading}"></span>
-              </b-btn>
-            </div>
+        </div>
+        <div class="offset-md-6 col-md-6 col-sm-6">
+          <div class="form-group">
+            <b-btn
+              class="btn-block btn-lg btn-primary"
+              :disabled="!socket.sessionToken || exchange.givenCurrency === exchange.receivedCurrency"
+              type="submit"
+            >
+              EXCHANGE
+              <span class="loader" :class="{loading: isLoading}"></span>
+            </b-btn>
           </div>
         </div>
       </div>
-    </b-form>
+    </div>
+  </b-form>
 </template>
         
 <script>
@@ -165,7 +196,7 @@ export default {
         description: String,
         type: String,
         totalAmount: String,
-        commissionAmount: Number
+        commission: Number
       },
       currencies: [
         {
@@ -191,8 +222,14 @@ export default {
     createExchange(e) {
       e.preventDefault();
       this.payment.totalAmount = this.countTotalAmount();
+      this.payment.description =
+        "Buying " +
+        this.exchange.receivedAmount +
+        " " +
+        this.exchange.receivedCurrency;
+      this.payment.rate = this.socket.rates[this.exchange.receivedCurrency];
       this.exchange.payment = this.payment;
-      this.$store.dispatch('setExchangeConfirm');
+      this.$store.dispatch("setExchangeConfirm");
     },
     countTotalAmount() {
       let amount = parseFloat(this.exchange.givenAmount);
@@ -200,14 +237,17 @@ export default {
         amount + this.countCommission(amount)
       );
       this.payment.type = this.exchange.givenCurrency;
-      return (this.payment.commission + amount).toString();
+      return (this.round(this.payment.commission + amount)).toString();
     },
     countCommission(value) {
-      return Math.round((
+      return this.round(
         value * this.commissions.default +
-        this.commissions.currency *
-          this.socket.rates[this.exchange.givenCurrency]
-      + Number.EPSILON)* 100) / 100;
+          this.commissions.currency *
+            this.socket.rates[this.exchange.givenCurrency]
+      );
+    },
+    round(value) {
+      return Math.round((value + Number.EPSILON) * 100) / 100;
     }
   }
 };

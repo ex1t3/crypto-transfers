@@ -77,8 +77,8 @@ export default {
           that.$root.$emit("completeLogin", params.data);
           that.isLoading = false;
         })
-        .catch(function(params) {
-          console.log(params);
+        .catch(function(params) {         
+          that.$store.dispatch('addAlert', params.response.data)
           that.isLoading = false;
         });
     }

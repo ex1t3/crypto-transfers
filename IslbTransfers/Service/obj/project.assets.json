@@ -6886,11 +6886,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "E:\\wamp64\\www\\islb-transfers\\ISLBTransfers\\Service\\Service.csproj",
+      "projectUniqueName": "E:\\wamp64\\www\\islb-transfers\\IslbTransfers\\Service\\Service.csproj",
       "projectName": "Service",
-      "projectPath": "E:\\wamp64\\www\\islb-transfers\\ISLBTransfers\\Service\\Service.csproj",
+      "projectPath": "E:\\wamp64\\www\\islb-transfers\\IslbTransfers\\Service\\Service.csproj",
       "packagesPath": "C:\\Users\\__it\\.nuget\\packages\\",
-      "outputPath": "E:\\wamp64\\www\\islb-transfers\\ISLBTransfers\\Service\\obj\\",
+      "outputPath": "E:\\wamp64\\www\\islb-transfers\\IslbTransfers\\Service\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
@@ -6904,17 +6904,18 @@
       ],
       "sources": {
         "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+        "http://nuget.intenselab.net:8444/nuget": {},
         "http://nuget.intenselab.net:8445/nuget": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
         "netcoreapp2.2": {
           "projectReferences": {
-            "E:\\wamp64\\www\\islb-transfers\\ISLBTransfers\\DAL\\DAL.csproj": {
-              "projectPath": "E:\\wamp64\\www\\islb-transfers\\ISLBTransfers\\DAL\\DAL.csproj"
+            "E:\\wamp64\\www\\islb-transfers\\IslbTransfers\\DAL\\DAL.csproj": {
+              "projectPath": "E:\\wamp64\\www\\islb-transfers\\IslbTransfers\\DAL\\DAL.csproj"
             },
-            "E:\\wamp64\\www\\islb-transfers\\ISLBTransfers\\Model\\Model.csproj": {
-              "projectPath": "E:\\wamp64\\www\\islb-transfers\\ISLBTransfers\\Model\\Model.csproj"
+            "E:\\wamp64\\www\\islb-transfers\\IslbTransfers\\Model\\Model.csproj": {
+              "projectPath": "E:\\wamp64\\www\\islb-transfers\\IslbTransfers\\Model\\Model.csproj"
             }
           }
         }

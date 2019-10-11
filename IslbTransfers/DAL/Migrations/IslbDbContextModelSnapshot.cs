@@ -19,6 +19,42 @@ namespace DAL.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
+            modelBuilder.Entity("Model.Models.ExchangeTransaction", b =>
+                {
+                    b.Property<string>("UniqueId")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<string>("AddressTo");
+
+                    b.Property<string>("BlockchainFee");
+
+                    b.Property<string>("Commission");
+
+                    b.Property<string>("Created");
+
+                    b.Property<string>("Description");
+
+                    b.Property<string>("ExternalServiceId");
+
+                    b.Property<string>("GivenAmount");
+
+                    b.Property<string>("Rate");
+
+                    b.Property<string>("ReceivedAmount");
+
+                    b.Property<string>("Status");
+
+                    b.Property<string>("Stock");
+
+                    b.Property<string>("TotalAmount");
+
+                    b.Property<int>("UserId");
+
+                    b.HasKey("UniqueId");
+
+                    b.ToTable("ExchangeTransactions");
+                });
+
             modelBuilder.Entity("Model.Models.User", b =>
                 {
                     b.Property<int>("Id")
@@ -108,17 +144,14 @@ namespace DAL.Migrations
 
             modelBuilder.Entity("Model.Models.UserSession", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                    b.Property<string>("Token")
+                        .ValueGeneratedOnAdd();
 
                     b.Property<DateTime>("ExpiryDateTime");
 
-                    b.Property<string>("Token");
-
                     b.Property<int>("UserId");
 
-                    b.HasKey("Id");
+                    b.HasKey("Token");
 
                     b.HasIndex("UserId");
 
@@ -127,19 +160,13 @@ namespace DAL.Migrations
 
             modelBuilder.Entity("Model.Models.UserWallet", b =>
                 {
-                    b.Property<int>("UserId")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                    b.Property<int>("UserId");
 
                     b.Property<string>("BTC");
 
                     b.Property<string>("ETH");
 
-                    b.Property<int?>("UserId1");
-
                     b.HasKey("UserId");
-
-                    b.HasIndex("UserId1");
 
                     b.ToTable("UserWallets");
                 });
@@ -170,9 +197,10 @@ namespace DAL.Migrations
 
             modelBuilder.Entity("Model.Models.UserWallet", b =>
                 {
-                    b.HasOne("Model.Models.User")
+                    b.HasOne("Model.Models.User", "User")
                         .WithMany("Wallets")
-                        .HasForeignKey("UserId1");
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 #pragma warning restore 612, 618
         }

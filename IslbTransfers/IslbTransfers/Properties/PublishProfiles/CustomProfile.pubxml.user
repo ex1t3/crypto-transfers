@@ -19,32 +19,38 @@ by editing this MSBuild file. In order to learn more about this please visit htt
     <File Include="AutoMapper.dll">
       <publishTime>06/03/2019 18:28:32</publishTime>
     </File>
+    <File Include="BouncyCastle.Crypto.dll">
+      <publishTime>02/08/2019 01:50:10</publishTime>
+    </File>
     <File Include="DAL.dll">
-      <publishTime>08/07/2019 20:52:42</publishTime>
+      <publishTime>08/16/2019 15:42:59</publishTime>
     </File>
     <File Include="DAL.pdb">
-      <publishTime>08/07/2019 20:52:42</publishTime>
+      <publishTime>08/16/2019 15:42:59</publishTime>
     </File>
     <File Include="dotnet-aspnet-codegenerator-design.dll">
       <publishTime>03/02/2019 19:52:30</publishTime>
     </File>
     <File Include="IslbTransfers.deps.json">
-      <publishTime>08/07/2019 20:57:01</publishTime>
+      <publishTime>08/16/2019 15:47:34</publishTime>
     </File>
     <File Include="IslbTransfers.dll">
-      <publishTime>08/07/2019 20:52:43</publishTime>
+      <publishTime>08/16/2019 15:43:01</publishTime>
     </File>
     <File Include="IslbTransfers.pdb">
-      <publishTime>08/07/2019 20:52:43</publishTime>
+      <publishTime>08/16/2019 15:43:01</publishTime>
     </File>
     <File Include="IslbTransfers.runtimeconfig.json">
-      <publishTime>08/07/2019 20:57:01</publishTime>
+      <publishTime>08/16/2019 15:47:34</publishTime>
     </File>
     <File Include="IslbTransfers.Views.dll">
-      <publishTime>08/07/2019 20:52:45</publishTime>
+      <publishTime>08/16/2019 15:43:03</publishTime>
     </File>
     <File Include="IslbTransfers.Views.pdb">
-      <publishTime>08/07/2019 20:52:45</publishTime>
+      <publishTime>08/16/2019 15:43:03</publishTime>
+    </File>
+    <File Include="MailKit.dll">
+      <publishTime>06/11/2019 11:01:00</publishTime>
     </File>
     <File Include="Microsoft.CodeAnalysis.CSharp.Workspaces.dll">
       <publishTime>05/22/2019 17:46:11</publishTime>
@@ -73,11 +79,14 @@ by editing this MSBuild file. In order to learn more about this please visit htt
     <File Include="Microsoft.VisualStudio.Web.CodeGenerators.Mvc.dll">
       <publishTime>03/02/2019 19:52:04</publishTime>
     </File>
+    <File Include="MimeKit.dll">
+      <publishTime>06/11/2019 10:27:40</publishTime>
+    </File>
     <File Include="Model.dll">
-      <publishTime>08/07/2019 20:52:41</publishTime>
+      <publishTime>08/16/2019 15:42:58</publishTime>
     </File>
     <File Include="Model.pdb">
-      <publishTime>08/07/2019 20:52:41</publishTime>
+      <publishTime>08/16/2019 15:42:58</publishTime>
     </File>
     <File Include="Newtonsoft.Json.dll">
       <publishTime>04/22/2019 01:06:16</publishTime>
@@ -86,10 +95,10 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>05/22/2019 17:46:04</publishTime>
     </File>
     <File Include="Service.dll">
-      <publishTime>08/07/2019 20:52:42</publishTime>
+      <publishTime>08/16/2019 15:43:00</publishTime>
     </File>
     <File Include="Service.pdb">
-      <publishTime>08/07/2019 20:52:43</publishTime>
+      <publishTime>08/16/2019 15:43:00</publishTime>
     </File>
     <File Include="Startup.cs">
       <publishTime>07/25/2019 23:05:09</publishTime>
@@ -323,67 +332,67 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>07/30/2019 14:58:43</publishTime>
     </File>
     <File Include="web.config">
-      <publishTime>08/07/2019 20:57:01</publishTime>
+      <publishTime>08/16/2019 15:47:34</publishTime>
     </File>
     <File Include="wwwroot/dist/app.css">
-      <publishTime>08/07/2019 21:19:47</publishTime>
+      <publishTime>08/16/2019 15:44:59</publishTime>
     </File>
     <File Include="wwwroot/dist/app.js">
-      <publishTime>08/07/2019 21:25:54</publishTime>
+      <publishTime>08/16/2019 15:45:04</publishTime>
     </File>
     <File Include="wwwroot/dist/app.js.map">
-      <publishTime>08/07/2019 21:25:55</publishTime>
+      <publishTime>08/16/2019 15:45:05</publishTime>
     </File>
     <File Include="wwwroot/dist/chunk-vendors.css">
-      <publishTime>08/07/2019 21:19:47</publishTime>
+      <publishTime>08/16/2019 15:44:59</publishTime>
     </File>
     <File Include="wwwroot/dist/chunk-vendors.js">
-      <publishTime>08/07/2019 21:19:47</publishTime>
+      <publishTime>08/16/2019 15:44:59</publishTime>
     </File>
     <File Include="wwwroot/dist/chunk-vendors.js.map">
-      <publishTime>08/07/2019 21:19:47</publishTime>
+      <publishTime>08/16/2019 15:44:59</publishTime>
     </File>
     <File Include="wwwroot/favicon.ico">
-      <publishTime>08/07/2019 21:19:47</publishTime>
+      <publishTime>08/16/2019 15:44:59</publishTime>
     </File>
     <File Include="wwwroot/img/Bitcoin.61a3b5f9.svg">
-      <publishTime>08/07/2019 21:19:47</publishTime>
+      <publishTime>08/16/2019 15:44:59</publishTime>
     </File>
     <File Include="wwwroot/img/Dash.aa490e6d.svg">
-      <publishTime>08/07/2019 21:19:47</publishTime>
+      <publishTime>08/16/2019 15:44:59</publishTime>
     </File>
     <File Include="wwwroot/img/dollar.ba163811.svg">
-      <publishTime>08/07/2019 21:19:47</publishTime>
+      <publishTime>08/16/2019 15:44:59</publishTime>
     </File>
     <File Include="wwwroot/img/Ethereum.e6ef406d.svg">
-      <publishTime>08/07/2019 21:19:47</publishTime>
+      <publishTime>08/16/2019 15:44:59</publishTime>
     </File>
     <File Include="wwwroot/img/facebook-white.52b25dbe.svg">
-      <publishTime>08/07/2019 21:19:47</publishTime>
+      <publishTime>08/16/2019 15:44:59</publishTime>
     </File>
     <File Include="wwwroot/img/facebook.c509a4c4.svg">
-      <publishTime>08/07/2019 21:19:47</publishTime>
+      <publishTime>08/16/2019 15:44:59</publishTime>
     </File>
     <File Include="wwwroot/img/google-plus.8429afad.svg">
-      <publishTime>08/07/2019 21:19:47</publishTime>
+      <publishTime>08/16/2019 15:44:59</publishTime>
     </File>
     <File Include="wwwroot/img/instagram-white.1c0000aa.svg">
-      <publishTime>08/07/2019 21:19:47</publishTime>
+      <publishTime>08/16/2019 15:44:59</publishTime>
     </File>
     <File Include="wwwroot/img/islb-bottom-wave.eee82075.png">
-      <publishTime>08/07/2019 21:19:47</publishTime>
+      <publishTime>08/16/2019 15:44:59</publishTime>
     </File>
     <File Include="wwwroot/img/Litecoin.12f07007.svg">
-      <publishTime>08/07/2019 21:19:47</publishTime>
+      <publishTime>08/16/2019 15:44:59</publishTime>
     </File>
     <File Include="wwwroot/img/twitter-white.dcc7333e.svg">
-      <publishTime>08/07/2019 21:19:47</publishTime>
+      <publishTime>08/16/2019 15:44:59</publishTime>
     </File>
     <File Include="wwwroot/img/youtube-white.2187cf54.svg">
-      <publishTime>08/07/2019 21:19:47</publishTime>
+      <publishTime>08/16/2019 15:44:59</publishTime>
     </File>
     <File Include="wwwroot/index.html">
-      <publishTime>08/07/2019 21:19:47</publishTime>
+      <publishTime>08/16/2019 15:44:59</publishTime>
     </File>
   </ItemGroup>
 </Project>

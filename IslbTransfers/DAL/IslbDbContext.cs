@@ -25,5 +25,6 @@ namespace DAL
         public DbSet<UserExternalLogin> UserExternalLogins { get; set; }
         public DbSet<UserIdentityKyc> UserIdentityKycs { get; set; }
         public DbSet<UserWallet> UserWallets { get; set; }
+        public DbSet<ExchangeTransaction> ExchangeTransactions { get; set; }
     }
 }

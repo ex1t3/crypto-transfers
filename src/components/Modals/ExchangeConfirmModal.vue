@@ -22,6 +22,12 @@
           class="amount"
         >{{ exchange.receivedAmount + " " + exchange.receivedCurrency }}</span>
       </p>
+      <p class="details-item">
+        Address to:
+        <span
+          class="amount"
+        >{{ exchange.addressTo }}</span>
+      </p>
     </div>
     <div class="details-block">
       <p class="details-header">Payment details:</p>
@@ -46,8 +52,10 @@
     </div>
     <div class="details-block">
       <p class="details-header">Payment method:</p>
+
+      <!-- PAYPAL METHOD -->
       <div
-        class="details-item"
+        class="details-item payments"
         v-if="exchange.givenCurrency === 'USD' || exchange.givenCurrency === 'EUR'"
       >
         <PayPal
@@ -63,12 +71,36 @@
         />
         <small>*The exchange transaction will be submitted once you complete a payment via PayPal</small>
       </div>
+
+      <!-- BLOCKCHAIN METHOD -->
+      <div
+        class="details-item payments"
+        v-if="exchange.givenCurrency !== 'USD' && exchange.givenCurrency !== 'EUR'"
+      >
+        <p>
+          <input
+            type="text"
+            class="form-control"
+            readonly
+            :value="socket.wallets[exchange.givenCurrency]"
+          />
+        </p>
+        <p>OR</p>
+        <QRCode :value="socket.wallets[exchange.givenCurrency]" size="100" />
+
+        <p>
+          <small>*To submit exchange transaction, please, fill this address with a given amount and press CONFIRM button</small>
+        </p>
+        <b-form-group>
+          <b-btn type="button" class="btn-primary btn-block">CONFIRM</b-btn>
+        </b-form-group>
+      </div>
     </div>
-    <!-- <b-btn class="btn-primary btn-block">CONFIRM EXCHANGE</b-btn> -->
   </b-modal>
 </template>
 <script>
 import PayPal from "vue-paypal-checkout";
+import QRCode from "qrcode.vue";
 import { mapGetters } from "vuex";
 import store from "../../store";
 import axios from "axios";
@@ -77,13 +109,15 @@ export default {
   store,
   computed: mapGetters({
     exchange: "getExchangeData",
+    socket: "getSocketData",
     isOpened: "getExchangeConfirmationState"
   }),
   data() {
     return {
+      transaction: Object,
       credentials: {
         sandbox:
-          "AaC3uSJ6GDwBwl5azwFjRfk2Hy9xAnTWwEaUPah4uyIFVnLDz3U39OlhGrthMLyfxOs1IhRR-zhGVfRW"
+          "AVQW1lwd5DMIAB-FU0ApGTbYdvIj_ifU4a_2g72I7yLYIiMD_xhWGQNpB7kRcVFRoSHZe5RFAULKu7ct"
       },
       style: {
         label: "paypal",
@@ -109,16 +143,56 @@ export default {
     hideModal() {
       this.$store.dispatch("setExchangeConfirm");
     },
-    completePayPalTransaction(data) {
-      this.$store.dispatch("addAlert", {
-        duration: 7000,
-        message:
-          "Payment successfully confirmed. The exchange transaction has been submitted.",
-        type: "0"
-      });
+    completePayPalTransaction() {
+      let that = this;
+      axios({
+        method: "POST",
+        url: "https://localhost:44357/api/transaction/paypal_confirm_exchange",
+        data: JSON.stringify(this.transaction.ExternalServiceId),
+        headers: {
+          Authorization: "Bearer " + localStorage.getItem("access_token"),
+          "Content-Type": "application/json; charset=utf-8"
+        }
+      })
+        .then(response => {
+          that.$store.dispatch("addAlert", response.data)
+          that.$store.dispatch("socketSET", that.transaction)
+        })
+        .catch(response => {
+          console.log(response);
+        });
     },
     authorizePayPalTransaction(data) {
+      this.transaction = {
+        ExternalServiceId: data.paymentID,
+        Stock:
+          this.exchange.givenCurrency + "-" + this.exchange.receivedCurrency,
+        GivenAmount: this.exchange.givenAmount,
+        ReceivedAmount: this.exchange.receivedAmount,
+        TotalAmount: this.exchange.payment.totalAmount,
+        Commission: this.exchange.payment.commission,
+        Rate:
+          this.socket.rates[this.exchange.receivedCurrency] /
+          this.socket.rates[this.exchange.givenCurrency],
+        Description: this.exchange.payment.description,
+        AddressTo: this.exchange.addressTo,
+        BlockchainFee: "Regular"
+      };
       console.log(data);
+      axios({
+        method: "POST",
+        url: "https://localhost:44357/api/transaction/paypal_create_exchange",
+        data: this.transaction,
+        headers: {
+          Authorization: "Bearer " + localStorage.getItem("access_token")
+        }
+      })
+        .then(response => {
+          console.log(response);
+        })
+        .catch(response => {
+          console.log(response);
+        });
     },
     cancelPayPalTransaction(data) {
       this.$store.dispatch("addAlert", {
@@ -130,7 +204,8 @@ export default {
     }
   },
   components: {
-    PayPal
+    PayPal,
+    QRCode
   }
 };
 </script>
@@ -149,6 +224,9 @@ export default {
 }
 .details-item {
   margin: 0 0 0.5rem 1rem;
+}
+.payments {
+  text-align: center;
 }
 .amount {
   font-weight: 600;

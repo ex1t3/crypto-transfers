@@ -1,6 +1,4 @@
-<template>
-  
-</template>
+<template></template>
 
 <script>
 import { mapGetters } from "vuex";
@@ -31,9 +29,12 @@ export default {
   box-shadow: 0 0 0 0rem rgba(143, 136, 206, 0.17);
   border: transparent;
 }
+.exchange-to-icon {
+  padding-top: 10px;
+}
 .rates {
-  text-align: right;
-  font-size: 12px;
+  text-align: center;
+  font-size: 13px;
   margin: 0;
 }
 .selected-currency {
@@ -46,7 +47,15 @@ export default {
     margin-top: 15px;
   }
   .rates {
-    text-align: center;
+    display: inline-block;
+    margin-top: 10px;
+    font-size: 12px;
+  }
+}
+@media (max-width: 576px) {
+  .exchange-to-icon {
+    padding: 0;
+    transform: rotateZ(90deg);
   }
 }
 </style>

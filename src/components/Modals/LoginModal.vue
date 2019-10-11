@@ -81,7 +81,7 @@ export default {
         url: "https://localhost:44357/api/account/login",
         data: this.login,
         headers: {
-          "Content-Type": "application/json"
+          "Content-Type": "application/json charset=UTF-8"
         }
       })
         .then(function(params) {
@@ -89,6 +89,7 @@ export default {
           that.isLoading = false;
         })
         .catch(function(params) {
+          that.$store.dispatch('addAlert', params.response.data)
           console.log(params);
           that.isLoading = false;
         });

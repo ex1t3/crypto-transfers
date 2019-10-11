@@ -28,7 +28,7 @@ namespace IslbTransfers.CustomAttributes
         public override void OnActionExecuting(ActionExecutingContext context)
         {
             var token = context.HttpContext.Request.Headers["Authorization"].ToString()?.Substring(7);
-            if (_accountService.ReValidateUserSession(token, context.HttpContext.User.Identity.Name)) return;
+            if (_accountService.IsSessionValid(token, context.HttpContext.User.Identity.Name)) return;
             context.Result = new BadRequestObjectResult("Your session isn't valid or has been expired.");
         }
     }

@@ -19,23 +19,23 @@ namespace Service.Services
 {
     public interface IAccountService
     {
-        UserClientData Authenticate(User user);
-        UserClientData Register(User user);
-        UserClientData GetClientData(User user, string token = null);
-        User CheckForUserIdentity(string email, string password);
-        User GetByEmail(string email);
-        Task<UserFacebookCredentials> GetUserDataViaFacebook(string token);
-        Task<UserGoogleCredentials> GetUserDataViaGoogle(string token);
+        Task<UserClientSideData> AuthenticateAsync(User user);
+        Task<UserClientSideData> RegisterAsync(User user);
+        Task<UserClientSideData> GetClientSideDataAsync(User user, string token = null);
+        Task<User> CheckForIdentityAsync(string email, string password);
+        Task<User> GetByEmailAsync(string email);
+        Task<OAuthApiCredentials> GetDataViaSocialProvider(string token, string provider);
         string HashPassword(string password);
         void Update(User user);
-        void AddExternalLogin(UserExternalLogin login);
-        UserExternalLogin GetExternalLogin(string id, string name);
+        Task AddExternalLoginAsync(UserExternalLogin login);
+        Task<UserExternalLogin> GetExternalLoginAsync(string id, string name);
         void DeleteExpiredUserSessions();
-        void InValidateUserSession(int userId, string token);
-        bool ReValidateUserSession(string token, string email);
-        void AddIdentity(UserIdentityKyc userIdentity);
-        UserIdentityKyc GetIdentity(int userId);
-        UserWallet GetWallets(int userId);
+        void InValidateSession(int userId, string token);
+        bool IsSessionValid(string token, string email);
+        Task AddIdentityAsync(UserIdentityKyc userIdentity);
+        Task<UserIdentityKyc> GetIdentityAsync(int userId);
+        Task<UserWallet> GetWalletsAsync(int userId);
+        void UpdateWallets(UserWallet wallet);
     }
     public class AccountService : IAccountService
     {
@@ -50,6 +50,12 @@ namespace Service.Services
         private readonly int _defaultUserSessionTimeOut = 7;
         private readonly string _secureCode = "some_secure_code_#refJHJFHcnn212"; //TODO: More protected code need to be implemented in secure reasons
 
+        private readonly Dictionary<string, string[]> _socialLinks = new Dictionary<string, string[]>()
+        {
+            { "facebook", new[] {"https://graph.facebook.com/v2.8/me?fields=id,email,first_name,last_name,gender,locale,birthday,picture", "access_token"} },
+            { "google", new[] {"https://www.googleapis.com/oauth2/v3/tokeninfo", "id_token"}}
+        };
+
         public AccountService(IDbRepository<User> userRepository, IOptions<OAuthSettings> oauthOptions, IDbRepository<UserSession> sessionRepository, IDbRepository<UserExternalLogin> externalLoginRepository, IDbRepository<UserIdentityKyc> userIdentityRepository, IMapper mapper, IDbRepository<UserWallet> userWalletRepository)
         {
             this._userRepository = userRepository;
@@ -62,29 +68,44 @@ namespace Service.Services
         }
 
         // Login user and get his unique session token
-        public UserClientData Authenticate(User user)
+        public async Task<UserClientSideData> AuthenticateAsync(User user)
         {
             // If login successful generate JWT token
-            var token = GenerateToken(user);
+            var token = GenerateAccessToken(user);
 
             // Delete session that have expired
             DeleteExpiredUserSessions();
 
             // Add a new user's session
-            AddSession(user.Id, token);
+            await AddSessionAsync(user.Id, token);
 
-            return GetClientData(user, token);
+            return await GetClientSideDataAsync(user, token);
 
         }
 
-        public UserIdentityKyc GetIdentity(int userId)
+        public async Task<UserIdentityKyc> GetIdentityAsync(int userId)
         {
-            return _userIdentityRepository.Get(x => x.UserId == userId);
+            return await _userIdentityRepository.GetAsync(x => x.UserId == userId);
         }
 
-        public UserWallet GetWallets(int userId)
+        public async Task<UserWallet> GetWalletsAsync(int userId)
         {
-            return _userWalletRepository.Get(x => x.UserId == userId);
+            return await _userWalletRepository.GetAsync(x => x.UserId == userId);
+        }
+
+        public void UpdateWallets(UserWallet wallet)
+        {
+            var storedWallet = _userWalletRepository.Get(x => x.UserId == wallet.UserId) ?? wallet;
+            if (storedWallet.UserId > 0)
+            {
+                storedWallet.BTC = wallet.BTC;
+                storedWallet.ETH = wallet.ETH;
+                _userWalletRepository.Update(storedWallet);
+            }
+            else
+            {
+                _userWalletRepository.AddAsync(storedWallet);
+            }
         }
 
         public string GenerateSocketToken(int userId)
@@ -104,10 +125,10 @@ namespace Service.Services
         }
 
         // Check if user data is correct
-        public UserClientData GetClientData(User user, string token = null)
+        public async Task<UserClientSideData> GetClientSideDataAsync(User user, string token = null)
         {
-            var mappedIdentity = _mapper.Map<UserIdentityViewModel>(GetIdentity(user.Id) ?? new UserIdentityKyc());
-            return new UserClientData()
+            var mappedIdentity = _mapper.Map<UserIdentityViewModel>(await GetIdentityAsync(user.Id) ?? new UserIdentityKyc());
+            return new UserClientSideData()
             {
                 Email = user.Email,
                 FirstName = user.FirstName,
@@ -117,33 +138,33 @@ namespace Service.Services
                 Identity = mappedIdentity,
                 IsExtraLogged = user.IsExtraLogged,
                 IsEmailVerified = user.IsEmailVerified,
-                Wallets = GetWallets(user.Id) ?? new UserWallet()
+                Wallets = await GetWalletsAsync(user.Id) ?? new UserWallet()
             };
         }
 
-        public User CheckForUserIdentity(string email, string password)
+        public async Task<User> CheckForIdentityAsync(string email, string password)
         {
-            var user = GetByEmail(email); // check if user exists
+            var user = await GetByEmailAsync(email); // check if user exists
             if (user == null) return null;
             return CheckHash(password, user.Password) ? user : null;
         }
 
         // Register user in DB
-        public UserClientData Register(User registeredUser)
+        public async Task<UserClientSideData> RegisterAsync(User registeredUser)
         {
             registeredUser.CreatedDateTime = DateTime.Now;
-            Add(registeredUser);
-            var userClientData = Authenticate(registeredUser);
+            await AddAsync(registeredUser);
+            var userClientData = await AuthenticateAsync(registeredUser);
             return userClientData;
         }
 
-        public User GetByEmail(string email)
+        public async Task<User> GetByEmailAsync(string email)
         {
-            return _userRepository.Get(x => x.Email == email);
+            return await _userRepository.GetAsync(x => x.Email == email);
         }
 
         // Generate JWT token for authorization
-        public string GenerateToken(User user)
+        public string GenerateAccessToken(User user)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes(_oauthOptions.Secret);
@@ -156,7 +177,7 @@ namespace Service.Services
                     new Claim(ClaimTypes.Name, user.Email),
                     new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
                 }),
-                Expires = DateTime.UtcNow.AddDays(_defaultUserSessionTimeOut),
+                Expires = DateTime.Now.AddDays(_defaultUserSessionTimeOut),
                 SigningCredentials = credentials
             };
             return tokenHandler.WriteToken(tokenHandler.CreateToken(tokenDescriptor));
@@ -194,13 +215,13 @@ namespace Service.Services
         }
 
         // Add new user to DB
-        public void Add(User user)
+        public async Task AddAsync(User user)
         {
-            _userRepository.Add(user);
+            await _userRepository.AddAsync(user);
         }
 
         // Register in DB new user's session
-        public void AddSession(int userId, string token)
+        public async Task AddSessionAsync(int userId, string token)
         {
             var session = new UserSession()
             {
@@ -208,14 +229,14 @@ namespace Service.Services
                 ExpiryDateTime = DateTime.UtcNow.AddDays(_defaultUserSessionTimeOut),
                 Token = token
             };
-            _sessionRepository.Add(session);
+           await _sessionRepository.AddAsync(session);
 
         }
 
         // Extend user's session if it is valid
-        public bool ReValidateUserSession(string token, string email)
+        public bool IsSessionValid(string token, string email)
         {
-            var currentUserId = GetByEmail(email)?.Id;
+            var currentUserId = GetByEmailAsync(email)?.Id;
             var userSession = _sessionRepository.Get(x => x.UserId == currentUserId && x.Token == token);
 
             if (userSession == null)
@@ -227,6 +248,7 @@ namespace Service.Services
             if (userSession.ExpiryDateTime < DateTime.Now)
             {
                 // User's session is expired --> invalid session
+                _sessionRepository.Delete(userSession);
                 return false;
             }
 
@@ -237,13 +259,13 @@ namespace Service.Services
             return true;
         }
 
-        public void AddIdentity(UserIdentityKyc userIdentity)
+        public async Task AddIdentityAsync(UserIdentityKyc userIdentity)
         {
-            _userIdentityRepository.Add(userIdentity);
+            await _userIdentityRepository.AddAsync(userIdentity);
         }
 
         // Delete specific user's session from DB
-        public void InValidateUserSession(int userId, string token)
+        public void InValidateSession(int userId, string token)
         {
             var userSession = _sessionRepository.Get(x => x.UserId == userId && x.Token == token);
             if (userSession != null)
@@ -255,7 +277,7 @@ namespace Service.Services
         // Delete all the session with expired date time
         public void DeleteExpiredUserSessions()
         {
-            _sessionRepository.Delete(x => x.ExpiryDateTime > DateTime.Now);
+            _sessionRepository.Delete(x => x.ExpiryDateTime < DateTime.Now);
         }
 
         // Update specific user in DB
@@ -265,59 +287,33 @@ namespace Service.Services
         }
 
         // Add record about new external login to DB
-        public void AddExternalLogin(UserExternalLogin login)
+        public async Task AddExternalLoginAsync(UserExternalLogin login)
         {
-            _externalLoginRepository.Add(login);
+            await _externalLoginRepository.AddAsync(login);
         }
 
         // Get specific external login from DB
-        public UserExternalLogin GetExternalLogin(string id, string name)
+        public async  Task<UserExternalLogin> GetExternalLoginAsync(string id, string name)
         {
-            return _externalLoginRepository.Get(x => x.ProviderId == id && x.ProviderName == name);
+            return await _externalLoginRepository.GetAsync(x => x.ProviderId == id && x.ProviderName == name);
         }
 
-        // Pull user login data via Facebook API
-        public async Task<UserFacebookCredentials> GetUserDataViaFacebook(string token)
+        // Pull user login data via social provider's API
+        public async Task<OAuthApiCredentials> GetDataViaSocialProvider(string token, string provider)
         {
+            if (_socialLinks[provider] == null) return null;
             using (var http = new HttpClient())
             {
                 var postData = new Dictionary<string, string>()
                 {
-                    {"access_token",token}
+                    {_socialLinks[provider][1],token}
                 };
-                var httpResponse = await http.PostAsync(
-                    "https://graph.facebook.com/v2.8/me?fields=id,email,first_name,last_name,gender,locale,birthday,picture",
-                    new FormUrlEncodedContent(postData));
+                var httpResponse = await http.PostAsync(_socialLinks[provider][0], new FormUrlEncodedContent(postData));
                 if (httpResponse.StatusCode != HttpStatusCode.OK) return null;
                 var resultsData = httpResponse.Content.ReadAsStringAsync().Result;
-                var fbCredentials = JsonConvert.DeserializeObject<UserFacebookCredentials>(resultsData);
-                return CheckCredentialsForValidity(fbCredentials.Email, fbCredentials.Id) ? fbCredentials : null;
+                var userOAuthData = JsonConvert.DeserializeObject<OAuthApiCredentials>(resultsData);
+                return userOAuthData.Id != null ? userOAuthData : null;
             }
-        }
-
-        // Pull user login data via Facebook API
-        public async Task<UserGoogleCredentials> GetUserDataViaGoogle(string token)
-        {
-            using (var http = new HttpClient())
-            {
-                var postData = new Dictionary<string, string>()
-                {
-                    {"id_token",token}
-                };
-                var httpResponse = await http.PostAsync(
-                    "https://www.googleapis.com/oauth2/v3/tokeninfo",
-                    new FormUrlEncodedContent(postData));
-                if (httpResponse.StatusCode != HttpStatusCode.OK) return null;
-                var resultsData = httpResponse.Content.ReadAsStringAsync().Result;
-                var googleCredentials = JsonConvert.DeserializeObject<UserGoogleCredentials>(resultsData);
-                return CheckCredentialsForValidity(googleCredentials.Email, googleCredentials.Id) ? googleCredentials : null;
-            }
-        }
-
-        // CHECK IF RECEIVED CREDENTIALS ARE VALID
-        public bool CheckCredentialsForValidity(string email, string id)
-        {
-            return email != null && id != null;
         }
     }
 }

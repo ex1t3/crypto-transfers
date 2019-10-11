@@ -103,7 +103,7 @@ namespace DAL.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "UserWallets",
+                name: "UserWallet",
                 columns: table => new
                 {
                     UserId = table.Column<int>(nullable: false)
@@ -140,7 +140,7 @@ namespace DAL.Migrations
 
             migrationBuilder.CreateIndex(
                 name: "IX_UserWallets_UserId",
-                table: "UserWallets",
+                table: "UserWallet",
                 column: "UserId");
         }
 
@@ -156,7 +156,7 @@ namespace DAL.Migrations
                 name: "UserSessions");
 
             migrationBuilder.DropTable(
-                name: "UserWallets");
+                name: "UserWallet");
 
             migrationBuilder.DropTable(
                 name: "Users");

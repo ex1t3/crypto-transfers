@@ -28,10 +28,10 @@ namespace IslbTransfers.Controllers
         [Route("verify_email")]
         public async Task<IActionResult> SendVerificationLink()
         {
-            var user = _accountService.GetByEmail(User.Identity.Name);
+            var user = await _accountService.GetByEmailAsync(User.Identity.Name);
             var protocol = HttpContext.Request.Scheme + "://";
             var domain = HttpContext.Request.Host;
-            var linkToConfirm = "/#/verify";
+            const string linkToConfirm = "/#/verify";
             var code = await _emailService.GenerateVerificationCodeAsync(user.Id);
             var queryParameter = "?verification=" + code;
             user.EmailVerificationCode = code;
@@ -43,9 +43,9 @@ namespace IslbTransfers.Controllers
 
         [HttpPost]
         [Route("confirm_email")]
-        public IActionResult ConfirmEmailVerification([FromBody]string code)
+        public async Task<IActionResult> ConfirmEmailVerification([FromBody]string code)
         {
-            var user = _accountService.GetByEmail(User.Identity.Name);
+            var user = await _accountService.GetByEmailAsync(User.Identity.Name);
             var response = new ResponseMessage {Duration = 5000};
             if (user.EmailVerificationCode.Equals(code))
             {

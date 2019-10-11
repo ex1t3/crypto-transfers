@@ -31,7 +31,8 @@ export default new Vuex.Store({
       message: "",
       reconnectError: false,
       sessionToken: null,
-      rates: Array
+      rates: Array,
+      wallets: Array
     },
     transfer: {
       currency: "ETH",
@@ -46,6 +47,7 @@ export default new Vuex.Store({
       receivedCurrency: "BTC",
       givenAmount: "",
       receivedAmount: "",
+      addressTo: "",
       payment: Array
     },
     loadingButtonState: false
@@ -60,10 +62,10 @@ export default new Vuex.Store({
     getSocketData: state => state.socket,
     getExchangeConfirmationState: state => state.isExchangeConfirmOpened,
     getTransferConfirmationState: state => state.isTransferConfirmOpened,
-    isPageLoaded: state => state.isPageLoaded,
+    isPageLoaded: state => state.isPageLoaded
   },
   actions: {
-    authenticate: context => {
+    socketAUTH: context => {
       let data = {
         action: "initialize_session",
         email: context.state.user.email,
@@ -71,11 +73,15 @@ export default new Vuex.Store({
       };
       Vue.prototype.$socket.send(JSON.stringify(data));
     },
-    send: (context, message) => {
+    socketGET: (context, message) => {
       let data = {
         action: message,
         token: context.state.socket.sessionToken
       };
+      Vue.prototype.$socket.send(JSON.stringify(data));
+    },
+    socketSET: (context, data) => {
+      data.token = context.state.socket.sessionToken;
       Vue.prototype.$socket.send(JSON.stringify(data));
     },
     setUser({ commit }, user) {
@@ -155,6 +161,7 @@ export default new Vuex.Store({
         data.receivedAmount = "";
         return;
       }
+      data.addressTo = data.addressTo === "" ? state.user.wallets[data.receivedCurrency.toLowerCase()] : data.addressTo;
       data.receivedAmount =
         data.givenAmount /
         (state.socket.rates[data.receivedCurrency] /
@@ -192,6 +199,25 @@ export default new Vuex.Store({
         case "get_rates": {
           state.socket.rates = data.Rates;
           break;
+        }
+        case "get_wallets": {
+          state.socket.wallets = {
+            BTC: data.Wallets[0],
+            ETH: data.Wallets[1]
+          };
+          break;
+        }
+        case "activate_user": {
+          switch (data.WalletType) {
+            case "Bitcoin":
+              state.socket.wallets.BTC = data.Address;
+              break;
+            case "Ethereum":
+              state.socket.wallets.ETH = data.Address;
+              break;
+            default:
+              break;
+          }
         }
       }
     },

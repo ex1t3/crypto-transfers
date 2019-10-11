@@ -51,12 +51,14 @@ import { mapGetters } from "vuex";
 import store from "../store";
 import axios from "axios";
 
+import SocketHandler from "../mixins/socket-handler";
+
 export default {
   store,
+  mixins: [SocketHandler],
   computed: mapGetters({
     isLoggedIn: "getLoginState",
-    user: "getUser",
-    socket: "getSocketData"
+    user: "getUser"
   }),
   data () {
     return {
@@ -64,15 +66,8 @@ export default {
     }
   },
   watch: {
-    "socket.isConnected": function(flag) {
-      if (flag) this.$store.dispatch("authenticate");
-      else this.$store.dispatch("addAlert", {message: "Socket session closed", duration: 3000, type: 2})
-    },
-    "socket.sessionToken": function(token) {
-      if (token !== null) this.$store.dispatch("send", "get_rates");
-    },
-    $route: function (to, from) {
-      this.currentRoute = to.name
+    $route: function(to, from) {
+      this.currentRoute = to.name;
     }
   },
   beforeMount() {

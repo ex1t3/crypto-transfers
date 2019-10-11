@@ -127,10 +127,11 @@
   float: left;
   margin-left: 2px;
 }
-.crypto-animations--money-to-bank img {
+.crypto-animations--money-to-bank img, .crypto-coin img {
   width: 20px;
   height: 20px;
   vertical-align: middle;
+  margin-top: 2px;
 }
 .crypto-animations--start-point,
 .crypto-animations--end-point {
@@ -212,11 +213,6 @@
   height: 32px;
   padding-top: 3px;
   margin-left: -16px;
-}
-.crypto-coin img {
-  width: 20px;
-  height: 20px;
-  vertical-align: middle;
 }
 </style>
 

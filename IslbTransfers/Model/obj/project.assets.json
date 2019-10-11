@@ -3012,11 +3012,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "E:\\wamp64\\www\\islb-transfers\\ISLBTransfers\\Model\\Model.csproj",
+      "projectUniqueName": "E:\\wamp64\\www\\islb-transfers\\IslbTransfers\\Model\\Model.csproj",
       "projectName": "Model",
-      "projectPath": "E:\\wamp64\\www\\islb-transfers\\ISLBTransfers\\Model\\Model.csproj",
+      "projectPath": "E:\\wamp64\\www\\islb-transfers\\IslbTransfers\\Model\\Model.csproj",
       "packagesPath": "C:\\Users\\__it\\.nuget\\packages\\",
-      "outputPath": "E:\\wamp64\\www\\islb-transfers\\ISLBTransfers\\Model\\obj\\",
+      "outputPath": "E:\\wamp64\\www\\islb-transfers\\IslbTransfers\\Model\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
@@ -3030,6 +3030,7 @@
       ],
       "sources": {
         "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+        "http://nuget.intenselab.net:8444/nuget": {},
         "http://nuget.intenselab.net:8445/nuget": {},
         "https://api.nuget.org/v3/index.json": {}
       },

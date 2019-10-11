@@ -70,29 +70,26 @@ namespace IslbTransfers
                         IssuerSigningKey = new SymmetricSecurityKey(key),
                         ValidateIssuer = false,
                         ValidateAudience = false,
+                        RequireExpirationTime = true
                     };
                 });
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
-            services.AddScoped<IDbFactory, DbFactory>();
-            services.AddScoped<SessionAuthorizeAttribute>();
-            services.AddScoped<IAccountService, AccountService>();
-            services.AddScoped<IDbRepository<User>, DbRepository<User>>();
-            services.AddScoped<IDbRepository<UserSession>, DbRepository<UserSession>>();
-            services.AddScoped<IDbRepository<UserIdentityKyc>, DbRepository<UserIdentityKyc>>();
-            services.AddScoped<IDbRepository<UserExternalLogin>, DbRepository<UserExternalLogin>>();
-            services.AddScoped<IDbRepository<UserWallet>, DbRepository<UserWallet>>();
+            services.AddTransient<IslbDbContext>();
+            services.AddTransient<IDbFactory, DbFactory>();
+            services.AddTransient<SessionAuthorizeAttribute>();
+            services.AddTransient<IAccountService, AccountService>();
+            services.AddTransient(typeof(IDbRepository<>), typeof(DbRepository<>));
 
-            services.AddScoped<ITransactionService, TransactionService>();
-            services.AddScoped<IEmailService, EmailService>();
+            services.AddTransient<ITransactionService, TransactionService>();
+            services.AddTransient<IEmailService, EmailService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
-
-            app.UseDeveloperExceptionPage();
             if (env.IsDevelopment())
             {
+                app.UseDeveloperExceptionPage();
             }
             else
             {
@@ -106,8 +103,7 @@ namespace IslbTransfers
                 .AllowAnyOrigin()
                 .AllowAnyMethod()
                 .AllowAnyHeader());
-
-            app.UseStaticFiles();
+            
             app.UseStaticFiles(new StaticFileOptions
             {
                 FileProvider = new PhysicalFileProvider(
