@@ -5,6 +5,7 @@
         <div class="col-sm-8 left">
           <a class="footer-brand">ISLB</a>
           <p>ISLB &copy; All rights reserved.</p>
+          <p>Estonian digital exchange license <br/> <u>№FRK000092</u>,  <u>FVR000112</u> </p>
         </div>
         <div class="col-sm-4 left">
           <p>Follow us on:</p>
