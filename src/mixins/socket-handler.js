@@ -16,7 +16,7 @@ export default {
     },
     "socket.wallets": function (wallets) {
       if (wallets.BTC === null) this.$store.dispatch("socketSET", {action: "activate_user", walletType: "Bitcoin"})
-      if (wallets.ETG === null) this.$store.dispatch("socketSET", {action: "activate_user", walletType: "Ethereum"})
+      if (wallets.ETH === null) this.$store.dispatch("socketSET", {action: "activate_user", walletType: "Ethereum"})
     },
     "socket.sessionToken": function(token) {
       if (token !== null) {

@@ -233,13 +233,17 @@ export default {
     },
     countTotalAmount() {
       let amount = parseFloat(this.exchange.givenAmount);
-      this.payment.commission = this.countCommission(
-        amount + this.countCommission(amount)
-      );
-      this.payment.type = this.exchange.givenCurrency;
+      this.payment.commission = 
+        this.exchange.givenCurrency in this.socket.wallets ? 
+        this.countCryptoCommission() : 
+        this.countEquityCommission(amount + this.countEquityCommission(amount));
+        this.payment.type = this.exchange.givenCurrency;
       return (this.round(this.payment.commission + amount)).toString();
     },
-    countCommission(value) {
+    countCryptoCommission() {
+      return 0;
+    },
+    countEquityCommission(value) {
       return this.round(
         value * this.commissions.default +
           this.commissions.currency *

@@ -4,8 +4,13 @@
       <b-row>
         <div class="col-sm-8 left">
           <a class="footer-brand">ISLB</a>
-          <p>ISLB &copy; All rights reserved.</p>
-          <p>Estonian digital exchange license <br/> <u>№FRK000092</u>,  <u>FVR000112</u> </p>
+          <p>ISLB &copy; All rights reserved.</p> 
+          <p>Estonian digital exchange license</p>
+          <div>
+            <img style="width: 15%" src="./img/european-union.jpg"/>
+            <img style="margin-left: 5px; width: 25%" src="./img/ministry-logo.png"/>
+          </div>
+          <p> <u>FRK000092</u>,  <u>FVR000112</u> </p>
         </div>
         <div class="col-sm-4 left">
           <p>Follow us on:</p>

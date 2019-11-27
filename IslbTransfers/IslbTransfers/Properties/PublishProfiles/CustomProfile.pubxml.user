@@ -335,55 +335,79 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>08/16/2019 15:47:34</publishTime>
     </File>
     <File Include="wwwroot/dist/app.css">
-      <publishTime>10/24/2019 01:45:29</publishTime>
+      <publishTime>11/26/2019 19:04:10</publishTime>
     </File>
     <File Include="wwwroot/dist/app.js">
-      <publishTime>10/24/2019 02:06:28</publishTime>
+      <publishTime>11/26/2019 19:05:35</publishTime>
     </File>
     <File Include="wwwroot/dist/app.js.map">
-      <publishTime>10/24/2019 02:06:32</publishTime>
+      <publishTime>11/26/2019 19:05:37</publishTime>
+    </File>
+    <File Include="wwwroot/dist/chunk-16989892.css">
+      <publishTime>11/26/2019 19:04:10</publishTime>
+    </File>
+    <File Include="wwwroot/dist/chunk-16989892.js">
+      <publishTime>11/26/2019 19:04:10</publishTime>
+    </File>
+    <File Include="wwwroot/dist/chunk-16989892.js.map">
+      <publishTime>11/26/2019 19:04:10</publishTime>
     </File>
     <File Include="wwwroot/dist/chunk-vendors.css">
-      <publishTime>10/24/2019 01:45:29</publishTime>
+      <publishTime>11/26/2019 19:04:10</publishTime>
     </File>
     <File Include="wwwroot/dist/chunk-vendors.js">
-      <publishTime>10/24/2019 01:45:29</publishTime>
+      <publishTime>11/26/2019 19:04:10</publishTime>
     </File>
     <File Include="wwwroot/dist/chunk-vendors.js.map">
-      <publishTime>10/24/2019 01:45:29</publishTime>
+      <publishTime>11/26/2019 19:04:10</publishTime>
     </File>
     <File Include="wwwroot/favicon.ico">
-      <publishTime>10/24/2019 01:45:29</publishTime>
+      <publishTime>11/07/2019 15:52:11</publishTime>
     </File>
     <File Include="wwwroot/img/Bitcoin.61a3b5f9.svg">
-      <publishTime>10/24/2019 01:45:29</publishTime>
+      <publishTime>11/07/2019 18:49:59</publishTime>
     </File>
     <File Include="wwwroot/img/Dash.aa490e6d.svg">
-      <publishTime>10/24/2019 01:45:29</publishTime>
+      <publishTime>11/07/2019 18:49:59</publishTime>
     </File>
     <File Include="wwwroot/img/dollar.ba163811.svg">
-      <publishTime>10/24/2019 01:45:29</publishTime>
+      <publishTime>11/07/2019 18:49:59</publishTime>
     </File>
     <File Include="wwwroot/img/Ethereum.e6ef406d.svg">
-      <publishTime>10/24/2019 01:45:29</publishTime>
+      <publishTime>11/07/2019 18:49:59</publishTime>
+    </File>
+    <File Include="wwwroot/img/european-union.4ed5f49c.jpg">
+      <publishTime>11/07/2019 18:49:59</publishTime>
     </File>
     <File Include="wwwroot/img/facebook-white.52b25dbe.svg">
       <publishTime>10/24/2019 01:45:29</publishTime>
     </File>
+    <File Include="wwwroot/img/facebook-white.9cd25e01.svg">
+      <publishTime>11/07/2019 18:49:59</publishTime>
+    </File>
     <File Include="wwwroot/img/facebook.c509a4c4.svg">
-      <publishTime>10/24/2019 01:45:29</publishTime>
+      <publishTime>11/07/2019 18:49:59</publishTime>
     </File>
     <File Include="wwwroot/img/google-plus.8429afad.svg">
-      <publishTime>10/24/2019 01:45:29</publishTime>
+      <publishTime>11/07/2019 18:49:59</publishTime>
     </File>
     <File Include="wwwroot/img/instagram-white.1c0000aa.svg">
       <publishTime>10/24/2019 01:45:29</publishTime>
     </File>
+    <File Include="wwwroot/img/instagram-white.2a591597.svg">
+      <publishTime>11/07/2019 18:49:59</publishTime>
+    </File>
     <File Include="wwwroot/img/islb-bottom-wave.eee82075.png">
-      <publishTime>10/24/2019 01:45:29</publishTime>
+      <publishTime>11/07/2019 18:49:59</publishTime>
     </File>
     <File Include="wwwroot/img/Litecoin.12f07007.svg">
-      <publishTime>10/24/2019 01:45:29</publishTime>
+      <publishTime>11/07/2019 18:49:59</publishTime>
+    </File>
+    <File Include="wwwroot/img/ministry-logo.2cc60144.png">
+      <publishTime>11/07/2019 18:49:59</publishTime>
+    </File>
+    <File Include="wwwroot/img/twitter-white.0558745b.svg">
+      <publishTime>11/07/2019 18:49:59</publishTime>
     </File>
     <File Include="wwwroot/img/twitter-white.dcc7333e.svg">
       <publishTime>10/24/2019 01:45:29</publishTime>
@@ -391,8 +415,11 @@ by editing this MSBuild file. In order to learn more about this please visit htt
     <File Include="wwwroot/img/youtube-white.2187cf54.svg">
       <publishTime>10/24/2019 01:45:29</publishTime>
     </File>
+    <File Include="wwwroot/img/youtube-white.6f6599c2.svg">
+      <publishTime>11/07/2019 18:49:59</publishTime>
+    </File>
     <File Include="wwwroot/index.html">
-      <publishTime>10/24/2019 01:45:29</publishTime>
+      <publishTime>11/07/2019 15:52:11</publishTime>
     </File>
   </ItemGroup>
 </Project>

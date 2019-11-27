@@ -24,9 +24,7 @@
       </p>
       <p class="details-item">
         Address to:
-        <span
-          class="amount"
-        >{{ exchange.addressTo }}</span>
+        <span class="amount">{{ exchange.addressTo }}</span>
       </p>
     </div>
     <div class="details-block">
@@ -54,10 +52,7 @@
       <p class="details-header">Payment method:</p>
 
       <!-- PAYPAL METHOD -->
-      <div
-        class="details-item payments"
-        v-if="exchange.givenCurrency === 'USD' || exchange.givenCurrency === 'EUR'"
-      >
+      <div class="details-item payments" v-if="!(exchange.givenCurrency in socket.wallets)">
         <PayPal
           :amount="exchange.payment.totalAmount"
           :currency="exchange.givenCurrency"
@@ -73,10 +68,7 @@
       </div>
 
       <!-- BLOCKCHAIN METHOD -->
-      <div
-        class="details-item payments"
-        v-if="exchange.givenCurrency !== 'USD' && exchange.givenCurrency !== 'EUR'"
-      >
+      <div class="details-item payments" v-if="exchange.givenCurrency in socket.wallets">
         <p>
           <input
             type="text"
@@ -89,7 +81,7 @@
         <QRCode :value="socket.wallets[exchange.givenCurrency]" size="100" />
 
         <p>
-          <small>*To submit exchange transaction, please, fill this address with a given amount and press CONFIRM button</small>
+          <small>*To submit an exchange transaction, please, fill this address with a given amount and press CONFIRM button</small>
         </p>
         <b-form-group>
           <b-btn type="button" class="btn-primary btn-block">CONFIRM</b-btn>
@@ -143,7 +135,7 @@ export default {
     hideModal() {
       this.$store.dispatch("setExchangeConfirm");
     },
-    completePayPalTransaction() {
+    completePayPalTransaction(data) {
       let that = this;
       axios({
         method: "POST",
@@ -155,12 +147,26 @@ export default {
         }
       })
         .then(response => {
-          that.$store.dispatch("addAlert", response.data)
-          that.$store.dispatch("socketSET", that.transaction)
+          that.$store.dispatch("addAlert", response.data);
+          that.fillDataForAPI("create_exchange", data.transactions[0].related_resources[0].sale.id, 
+          that.transaction.Stock, that.transaction.ReceivedAmount,
+          that.transaction.BlockchainFee, 0, that.transaction.AddressTo);
         })
         .catch(response => {
           console.log(response);
         });
+    },
+    fillDataForAPI(action, id, stock, amount, fee, feeAmount, address) {
+      let data = {
+        action: action,
+        transactionId: id,
+        stock: stock,
+        amount: amount,
+        desiredFee: fee,
+        addressTo: address,
+        feeAmount: feeAmount
+      };
+      this.$store.dispatch("socketSET", data);
     },
     authorizePayPalTransaction(data) {
       this.transaction = {
@@ -194,7 +200,7 @@ export default {
           console.log(response);
         });
     },
-    cancelPayPalTransaction(data) {
+    cancelPayPalTransaction() {
       this.$store.dispatch("addAlert", {
         duration: 7000,
         message:
